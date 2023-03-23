@@ -18,6 +18,10 @@ class RunningDotEffect(TemporalEffect):
             vol.Optional(
                 "color", description="Color of dot", default="#FF0000"
             ): validate_color,
+
+            vol.Optional(
+                "one way", description="One way movement of the dot", default=False
+            ): bool,
         },
     )
 
@@ -39,9 +43,11 @@ class RunningDotEffect(TemporalEffect):
         elif self._idx > 0 and not self._forward: 
             self._idx -= 1
          
-        if self._idx == self.pixel_count - 1 or self._idx == 0:
+        if (self._idx == self.pixel_count - 1 or self._idx == 0) and not self._config["one way"]:
             self._forward = not self._forward
-        
+        elif self._config["one way"] and self._idx == self.pixel_count -1:
+            self._idx = -1
 
+        print(self._idx)
             
         
