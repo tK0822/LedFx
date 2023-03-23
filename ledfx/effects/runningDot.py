@@ -47,7 +47,5 @@ class RunningDotEffect(TemporalEffect):
             self._forward = not self._forward
         elif self._config["one way"] and self._idx == self.pixel_count -1:
             self._idx = -1
-
-        print(self._idx)
             
         
