@@ -308,6 +308,11 @@ class Device(BaseRegistry):
 
 
 @BaseRegistry.no_registration
+class MidiDevice(Device):
+    pass
+
+
+@BaseRegistry.no_registration
 class NetworkedDevice(Device):
     """
     Networked device, handles resolving IP
@@ -619,7 +624,8 @@ class Devices(RegistryLoader):
             await device.async_initialize()
 
         device_config = device.config
-        device_config["name"] = wled_name
+        if device_type == "wled":
+            device_config["name"] = wled_name
         # Update and save the configuration
         self._ledfx.config["devices"].append(
             {
