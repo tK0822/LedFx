@@ -80,7 +80,7 @@ CORE_CONFIG_SCHEMA = vol.Schema(
         vol.Optional("visualisation_fps", default=30): vol.All(
             int, vol.Range(1, 60)
         ),
-        vol.Optional("visualisation_maxlen", default=50): vol.All(
+        vol.Optional("visualisation_maxlen", default=81): vol.All(
             int, vol.Range(5, 300)
         ),
         vol.Optional(
@@ -91,6 +91,7 @@ CORE_CONFIG_SCHEMA = vol.Schema(
         vol.Optional("user_colors", default={}): dict,
         vol.Optional("user_gradients", default={}): dict,
         vol.Optional("scan_on_startup", default=False): bool,
+        vol.Optional("create_segments", default=False): bool,
         vol.Optional("wled_preferences", default={}): dict,
         vol.Optional(
             "configuration_version", default=CONFIGURATION_VERSION
@@ -382,6 +383,7 @@ def migrate_config(old_config):
                     "config": new_effect_config,
                     "type": new_effect_id,
                 }
+            virtual["auto_generated"] = virtual.get("auto_generated", False)
         new_config["virtuals"] = virtuals
     else:  # time to make some virtuals
         from ledfx.utils import generate_id
@@ -404,6 +406,7 @@ def migrate_config(old_config):
                 {
                     "id": generate_id(name),
                     "is_device": device["id"],
+                    "auto_generated": False,
                     "config": virtual_config,
                     "segments": segments,
                 }

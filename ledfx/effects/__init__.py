@@ -200,6 +200,9 @@ class Effect(BaseRegistry):
     NAME = ""
     # over ride in effect children to hide existing keys from UI
     HIDDEN_KEYS = None
+    # over ride in effect children AND add an "advanced" bool to schema
+    # to show or hide in UI
+    ADVANCED_KEYS = None
     # over ride in effect children to allow edit and show others
     PERMITTED_KEYS = None
     _config = None
@@ -355,7 +358,9 @@ class Effect(BaseRegistry):
                 casting="unsafe",
             )
         # If the configured blur is greater than 0 we need to blur it
-        if self.configured_blur != 0.0:
+        # do not apply blur if we have 3 or less pixels as the matrix math
+        # demands it!
+        if self.configured_blur != 0.0 and self.pixel_count > 3:
             kernel = _gaussian_kernel1d(self.configured_blur, 0, len(pixels))
             pixels[:, 0] = np.convolve(pixels[:, 0], kernel, mode="same")
             pixels[:, 1] = np.convolve(pixels[:, 1], kernel, mode="same")
