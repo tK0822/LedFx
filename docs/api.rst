@@ -183,6 +183,109 @@ Modifies the information pertaining to the device and returns the new device as 
 
 Deletes a device with the matching *device_id*
 
+/api/find_devices
+=========================
+
+Find and add all WLED devices on the LAN.
+
+.. rubric:: POST
+
+For unregisted WLED devices, reads config direct from WLED remote device
+Will default the remote protocol to DDP, unless WLED device build is prior to DDP support, in which case it will default to UDP
+If device name has not been over ridden in WLED itself, then name will be generated from WLED-<6 digits of MAC Address>
+Additionally ledfx virtuals will be created for all virtuals defined on the WLED device itself
+
+Returns success as this is only a trigger action, device registration is handled by the back end
+
+/api/find_launchpad
+=========================
+
+.. rubric:: GET
+
+Returns the name of the first Launchpad device discovered on the system
+
+example:
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "device": "Launchpad X"
+    }
+
+if no device is found will return an error
+
+.. code-block:: json
+
+    {
+        "status": "error",
+        "error": "Failed to find launchpad"
+    }
+
+/api/find_openrgb/?server=1.2.3.4&port=5678
+===========================================
+
+.. rubric:: GET
+
+Optional Query parameters are supported as follows:
+
+'**server**' (optional): IP address of openRGB server, a default value of loacl host will be used
+'**port**' (optional): Port to be used for openRGB server. a default value of 6742 will be used
+
+In most cases these do not need to be defined as defaults of localhost and 6742 are used
+
+Returns all found openRGB devices registered with the openRGB server
+
+example:
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "devices": [
+            {
+                "name": "ASRock Z370 Gaming K6",
+                "type": 0,
+                "id": 0,
+                "leds": 1
+            },
+            {
+                "name": "ASUS ROG STRIX 3080 O10G V2 WHITE",
+                "type": 2,
+                "id": 1,
+                "leds": 22
+            },
+            {
+                "name": "Razer Deathadder V2",
+                "type": 6,
+                "id": 2,
+                "leds": 2
+            }
+        ]
+    }
+
+if no devices are found an empty array will be returned
+
+example:
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "devices": []
+    }
+
+if the openRGB server is not found an error will be returned
+
+example:
+
+.. code-block:: json
+
+    {
+        "status": "error",
+        "error": "timed out"
+    }
+
 /api/effects
 =========================
 
@@ -351,6 +454,80 @@ Save configuration of virtual's active effect as a custom preset for that effect
 
 Clear effect of a virtual
 
+/api/virtuals_tools
+===================
+
+Extensible support for general tools towards ALL virtuals in one call
+
+.. rubric:: PUT
+
+Supports tool instances of currently only force_color, others may be added in the future
+
+**force_color**
+
+Move all pixels in a virtual to specific color, will be overwritten by active effect
+Use during configuration / calibration
+
+.. code-block:: json
+
+    {
+      "tool": "force_color",
+      "color": "blue"
+    }
+
+.. code-block:: json
+
+    {
+      "tool": "force_color",
+      "color": "#FFFFFF"
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "force_color"
+    }
+
+/api/virtuals_tools/<virtual_id>
+=================================
+
+Extensible support for general tools towards a specified virtual
+
+.. rubric:: PUT
+
+Supports tool instances of currently only force_color, others may be added in the future
+
+**force_color**
+
+Move all pixels in a virtual to specific color, will be overwritten by active effect
+Use during configuration / calibration
+
+.. code-block:: json
+
+    {
+      "tool": "force_color",
+      "color": "blue"
+    }
+
+.. code-block:: json
+
+    {
+      "tool": "force_color",
+      "color": "#FFFFFF"
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "force_color"
+    }
+
 /api/effects/<effect_id>/presets
 ===================================
 
@@ -385,9 +562,79 @@ Set effects and configs of all devices to those specified in a scene
 
 Save effect configuration of devices as a scene
 
+Now support default behaviour when no "virtuals" key is provided of saving all currently active virtuals to the scene in their current configuration
+
+.. code-block:: json
+
+    {
+        "name": "test1",
+        "scene_image": "",
+        "scene_tags": "",
+        "scene_puturl": "",
+        "scene_payload": ""
+    }
+
+Where a "virtuals" key is provided, only the virtuals specified will be saved to the scene, using the effect type and config carried in the json payload
+
+.. collapse:: Expand for specified Virtuals Example
+
+    .. code-block:: json
+
+        {
+            "name": "test2",
+            "scene_image": "image: https://i.pinimg.com/736x/05/9c/a7/059ca7cf94a85a3e836693e84c5bf42f--red-frogs.jpg",
+            "scene_tags": "",
+            "scene_puturl": "",
+            "scene_payload": "",
+            "virtuals": {
+                "falcon1": {
+                    "type": "blade_power_plus",
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 2,
+                        "brightness": 1,
+                        "decay": 0.7,
+                        "flip": false,
+                        "frequency_range": "Lows (beat+bass)",
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "invert_roll": false,
+                        "mirror": false,
+                        "multiplier": 0.5
+                    }
+                },
+                "big-copy": {
+                    "type": "energy",
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 4,
+                        "brightness": 1,
+                        "color_cycler": false,
+                        "color_high": "#0000ff",
+                        "color_lows": "#ff0000",
+                        "color_mids": "#00ff00",
+                        "flip": false,
+                        "mirror": true,
+                        "mixing_mode": "additive",
+                        "sensitivity": 0.6
+                    }
+                }
+            }
+        }
+
+|
 .. rubric:: DELETE
 
 Delete a scene
+
+.. code-block:: json
+
+    {
+        "id": "test2"
+    }
+
 
 /api/integrations
 ================================

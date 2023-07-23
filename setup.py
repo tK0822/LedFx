@@ -26,7 +26,6 @@ INSTALL_REQUIRES = [
     "aiohttp~=3.8.3",
     "aiohttp_cors>=0.7.0",
     "aubio>=0.4.9",
-    "bokeh~=3.1.0",
     "cython>=0.29.21",
     "certifi>=2020.12.5",
     "multidict~=5.0.0",
@@ -35,7 +34,7 @@ INSTALL_REQUIRES = [
     "psutil>=5.8.0",
     "pyserial>=3.5",
     "pystray>=0.17",
-    "python-rtmidi~=1.4.9",
+    "python-rtmidi~=1.5.3",
     "requests~=2.28.2",
     "sacn~=1.6.3",
     "sentry-sdk==1.14.0",
@@ -53,6 +52,7 @@ INSTALL_REQUIRES = [
     # We can install this on all linux devices, it just won't work for anything other than a Pi
     'rpi-ws281x>=4.3.0; platform_system == "Linux"',
     "flux-led>=0.28.35",
+    "python-mbedtls~=2.6.1",
 ]
 
 
