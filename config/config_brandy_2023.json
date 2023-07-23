@@ -236,6 +236,299 @@
     "port_s": 8443,
     "scan_on_startup": false,
     "scenes": {
+        "onfire": {
+            "name": "OnFire",
+            "scene_image": "Wallpaper",
+            "scene_midiactivate": null,
+            "scene_payload": null,
+            "scene_puturl": null,
+            "scene_tags": null,
+            "virtuals": {
+                "front01": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front02": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front03": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front04": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front05": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front06": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front07": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front08": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front09": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "front10": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "overhead01": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 30,
+                        "mirror": true,
+                        "speed": 0.10001
+                    },
+                    "type": "fire"
+                },
+                "overhead02": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 30,
+                        "mirror": true,
+                        "speed": 0.10001
+                    },
+                    "type": "fire"
+                },
+                "overhead03": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "intensity": 30,
+                        "mirror": true,
+                        "speed": 0.10001
+                    },
+                    "type": "fire"
+                }
+            }
+        },
+        "pulsefront": {
+            "name": "PulseFront",
+            "scene_image": "Wallpaper",
+            "scene_midiactivate": null,
+            "scene_payload": null,
+            "scene_puturl": null,
+            "scene_tags": null,
+            "virtuals": {
+                "front-left-to-right": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 10,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, #ff0000 0.00%,#ff00b2 50.00%,#0000ff 100.00%)",
+                        "gradient_roll": 1,
+                        "mirror": true,
+                        "modulate": true,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.99,
+                        "speed": 10
+                    },
+                    "type": "gradient"
+                },
+                "overhead01": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 0.14,
+                        "color": "#800080",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1
+                    },
+                    "type": "singleColor"
+                },
+                "overhead02": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 0.14,
+                        "color": "#800080",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1
+                    },
+                    "type": "singleColor"
+                },
+                "overhead03": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 0.14,
+                        "color": "#800080",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1
+                    },
+                    "type": "singleColor"
+                }
+            }
+        },
         "strobebar": {
             "name": "StrobeBar",
             "scene_image": "Wallpaper",
@@ -496,19 +789,17 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "beat_skip": "none",
-                    "blur": 0.0,
-                    "brightness": 0.5,
-                    "color_step": 0.125,
-                    "ease_method": "ease_out",
+                    "blur": 1.5,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "mode": "wipe",
-                    "skip_every": 1
+                    "speed": 0.04
                 },
-                "type": "bar"
+                "type": "fire"
             },
             "effects": {
                 "bands": {
@@ -606,10 +897,10 @@
                 },
                 "fade": {
                     "config": {
-                        "background_brightness": 1,
+                        "background_brightness": 1.0,
                         "background_color": "#000000",
-                        "blur": 0,
-                        "brightness": 1,
+                        "blur": 0.0,
+                        "brightness": 1.0,
                         "flip": false,
                         "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                         "gradient_roll": 7.5,
@@ -617,6 +908,22 @@
                         "speed": 6.9
                     },
                     "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
                 },
                 "gradient": {
                     "config": {
@@ -653,16 +960,31 @@
                 },
                 "rainbow": {
                     "config": {
-                        "background_brightness": 1,
+                        "background_brightness": 1.0,
                         "background_color": "#000000",
-                        "blur": 0,
-                        "brightness": 1,
-                        "flip": false,
-                        "frequency": 1,
-                        "mirror": false,
-                        "speed": 1
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
                     },
                     "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
                 },
                 "scan_and_flare": {
                     "config": {
@@ -688,6 +1010,22 @@
                         "use_grad": false
                     },
                     "type": "scan_and_flare"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front01",
@@ -720,19 +1058,17 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "beat_skip": "none",
-                    "blur": 0.0,
-                    "brightness": 0.5,
-                    "color_step": 0.125,
-                    "ease_method": "ease_out",
+                    "blur": 1.5,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "mode": "wipe",
-                    "skip_every": 1
+                    "speed": 0.04
                 },
-                "type": "bar"
+                "type": "fire"
             },
             "effects": {
                 "bar": {
@@ -752,6 +1088,93 @@
                         "skip_every": 1
                     },
                     "type": "bar"
+                },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front02",
@@ -784,22 +1207,75 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "bass_strobe_decay_rate": 0.5,
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
-                    "color_shift_delay": 1.0,
-                    "color_step": 0.0625,
+                    "color_shift": 0.15,
                     "flip": false,
-                    "gradient": "Dancefloor",
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "strobe_color": "#ff7800",
-                    "strobe_decay_rate": 0.5,
-                    "strobe_width": 15
+                    "speed": 0.04
                 },
-                "type": "real_strobe"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
                 "real_strobe": {
                     "config": {
                         "background_brightness": 1.0,
@@ -818,6 +1294,37 @@
                         "strobe_width": 15
                     },
                     "type": "real_strobe"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 },
                 "strobe": {
                     "config": {
@@ -866,22 +1373,75 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "bass_strobe_decay_rate": 0.5,
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
-                    "color_shift_delay": 1.0,
-                    "color_step": 0.0625,
+                    "color_shift": 0.15,
                     "flip": false,
-                    "gradient": "Dancefloor",
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "strobe_color": "#ff7800",
-                    "strobe_decay_rate": 0.5,
-                    "strobe_width": 15
+                    "speed": 0.04
                 },
-                "type": "real_strobe"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
                 "real_strobe": {
                     "config": {
                         "background_brightness": 1.0,
@@ -900,6 +1460,37 @@
                         "strobe_width": 15
                     },
                     "type": "real_strobe"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front04",
@@ -932,19 +1523,17 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "beat_skip": "none",
-                    "blur": 0.0,
-                    "brightness": 0.5,
-                    "color_step": 0.125,
-                    "ease_method": "ease_out",
+                    "blur": 1.5,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "mode": "wipe",
-                    "skip_every": 1
+                    "speed": 0.04
                 },
-                "type": "bar"
+                "type": "fire"
             },
             "effects": {
                 "bar": {
@@ -964,6 +1553,93 @@
                         "skip_every": 1
                     },
                     "type": "bar"
+                },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front05",
@@ -996,19 +1672,17 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "beat_skip": "none",
-                    "blur": 0.0,
-                    "brightness": 0.5,
-                    "color_step": 0.125,
-                    "ease_method": "ease_out",
+                    "blur": 1.5,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "mode": "wipe",
-                    "skip_every": 1
+                    "speed": 0.04
                 },
-                "type": "bar"
+                "type": "fire"
             },
             "effects": {
                 "bar": {
@@ -1028,6 +1702,93 @@
                         "skip_every": 1
                     },
                     "type": "bar"
+                },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front06",
@@ -1060,22 +1821,32 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "bass_strobe_decay_rate": 0.5,
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
-                    "color_shift_delay": 1.0,
-                    "color_step": 0.0625,
+                    "color_shift": 0.15,
                     "flip": false,
-                    "gradient": "Dancefloor",
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "strobe_color": "#ff7800",
-                    "strobe_decay_rate": 0.5,
-                    "strobe_width": 15
+                    "speed": 0.04
                 },
-                "type": "real_strobe"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
                 "equalizer": {
                     "config": {
                         "align": "left",
@@ -1093,10 +1864,10 @@
                 },
                 "fade": {
                     "config": {
-                        "background_brightness": 1,
+                        "background_brightness": 1.0,
                         "background_color": "#000000",
-                        "blur": 0,
-                        "brightness": 1,
+                        "blur": 0.0,
+                        "brightness": 1.0,
                         "flip": false,
                         "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                         "gradient_roll": 7.5,
@@ -1104,6 +1875,22 @@
                         "speed": 6.9
                     },
                     "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
                 },
                 "metro": {
                     "config": {
@@ -1120,6 +1907,19 @@
                         "steps": 4
                     },
                     "type": "metro"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
                 },
                 "real_strobe": {
                     "config": {
@@ -1139,6 +1939,37 @@
                         "strobe_width": 15
                     },
                     "type": "real_strobe"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front07",
@@ -1171,22 +2002,75 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "bass_strobe_decay_rate": 0.5,
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
-                    "color_shift_delay": 1.0,
-                    "color_step": 0.0625,
+                    "color_shift": 0.15,
                     "flip": false,
-                    "gradient": "Dancefloor",
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "strobe_color": "#ff7800",
-                    "strobe_decay_rate": 0.5,
-                    "strobe_width": 15
+                    "speed": 0.04
                 },
-                "type": "real_strobe"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
                 "real_strobe": {
                     "config": {
                         "background_brightness": 1.0,
@@ -1205,6 +2089,37 @@
                         "strobe_width": 15
                     },
                     "type": "real_strobe"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front08",
@@ -1237,19 +2152,17 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "beat_skip": "none",
-                    "blur": 0.0,
-                    "brightness": 0.5,
-                    "color_step": 0.125,
-                    "ease_method": "ease_out",
+                    "blur": 1.5,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "mode": "wipe",
-                    "skip_every": 1
+                    "speed": 0.04
                 },
-                "type": "bar"
+                "type": "fire"
             },
             "effects": {
                 "bar": {
@@ -1269,6 +2182,93 @@
                         "skip_every": 1
                     },
                     "type": "bar"
+                },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front09",
@@ -1301,19 +2301,17 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "beat_skip": "none",
-                    "blur": 0.0,
-                    "brightness": 0.5,
-                    "color_step": 0.125,
-                    "ease_method": "ease_out",
+                    "blur": 1.5,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                     "gradient_roll": 0.0,
+                    "intensity": 3,
                     "mirror": false,
-                    "mode": "wipe",
-                    "skip_every": 1
+                    "speed": 0.04
                 },
-                "type": "bar"
+                "type": "fire"
             },
             "effects": {
                 "bar": {
@@ -1334,6 +2332,19 @@
                     },
                     "type": "bar"
                 },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
                 "equalizer": {
                     "config": {
                         "align": "left",
@@ -1351,10 +2362,10 @@
                 },
                 "fade": {
                     "config": {
-                        "background_brightness": 1,
+                        "background_brightness": 1.0,
                         "background_color": "#000000",
-                        "blur": 0,
-                        "brightness": 1,
+                        "blur": 0.0,
+                        "brightness": 1.0,
                         "flip": false,
                         "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
                         "gradient_roll": 7.5,
@@ -1362,6 +2373,22 @@
                         "speed": 6.9
                     },
                     "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 3,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
                 },
                 "metro": {
                     "config": {
@@ -1378,6 +2405,50 @@
                         "steps": 4
                     },
                     "type": "metro"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "front10",
@@ -1410,17 +2481,32 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
-                    "gradient_roll": 6.0,
-                    "mirror": false,
-                    "speed": 3.0
+                    "gradient_roll": 0.0,
+                    "intensity": 30,
+                    "mirror": true,
+                    "speed": 0.10001
                 },
-                "type": "fade"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
                 "fade": {
                     "config": {
                         "background_brightness": 1.0,
@@ -1429,11 +2515,71 @@
                         "brightness": 1.0,
                         "flip": false,
                         "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
-                        "gradient_roll": 6.0,
+                        "gradient_roll": 7.5,
                         "mirror": false,
-                        "speed": 3.0
+                        "speed": 6.9
                     },
                     "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 30,
+                        "mirror": true,
+                        "speed": 0.10001
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 0.14,
+                        "color": "#800080",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "overhead01",
@@ -1466,17 +2612,32 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
-                    "gradient_roll": 6.0,
-                    "mirror": false,
-                    "speed": 3.0
+                    "gradient_roll": 0.0,
+                    "intensity": 30,
+                    "mirror": true,
+                    "speed": 0.10001
                 },
-                "type": "fade"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
                 "fade": {
                     "config": {
                         "background_brightness": 1.0,
@@ -1485,11 +2646,71 @@
                         "brightness": 1.0,
                         "flip": false,
                         "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
-                        "gradient_roll": 6.0,
+                        "gradient_roll": 7.5,
                         "mirror": false,
-                        "speed": 3.0
+                        "speed": 6.9
                     },
                     "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 30,
+                        "mirror": true,
+                        "speed": 0.10001
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 0.14,
+                        "color": "#800080",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "overhead02",
@@ -1522,17 +2743,32 @@
                 "config": {
                     "background_brightness": 1.0,
                     "background_color": "#000000",
-                    "blur": 0.0,
+                    "blur": 1.5,
                     "brightness": 1.0,
+                    "color_shift": 0.15,
                     "flip": false,
                     "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
-                    "gradient_roll": 6.0,
-                    "mirror": false,
-                    "speed": 3.0
+                    "gradient_roll": 0.0,
+                    "intensity": 30,
+                    "mirror": true,
+                    "speed": 0.10001
                 },
-                "type": "fade"
+                "type": "fire"
             },
             "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
                 "fade": {
                     "config": {
                         "background_brightness": 1.0,
@@ -1541,11 +2777,71 @@
                         "brightness": 1.0,
                         "flip": false,
                         "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
-                        "gradient_roll": 6.0,
+                        "gradient_roll": 7.5,
                         "mirror": false,
-                        "speed": 3.0
+                        "speed": 6.9
                     },
                     "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 1.5,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 30,
+                        "mirror": true,
+                        "speed": 0.10001
+                    },
+                    "type": "fire"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": true,
+                        "frequency": 4.4,
+                        "mirror": true,
+                        "speed": 1.1
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.3
+                    },
+                    "type": "running_lights"
+                },
+                "singleColor": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 0.14,
+                        "color": "#800080",
+                        "flip": false,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "singleColor"
                 }
             },
             "id": "overhead03",
@@ -1555,6 +2851,464 @@
                     "overhead03",
                     0,
                     299,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "mdi:led-strip-variant",
+                "mapping": "span",
+                "max_brightness": 1.0,
+                "name": "FRONT_ALL",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.0
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "color_shift": 0.15,
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "intensity": 8,
+                    "mirror": false,
+                    "speed": 0.04
+                },
+                "type": "fire"
+            },
+            "effects": {
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": true,
+                        "mirror": false,
+                        "speed": 10
+                    },
+                    "type": "buildUp"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "speed": 0.5
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 8,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "gradient": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 10,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, #ff0000 0.00%,#ff00b2 50.00%,#0000ff 100.00%)",
+                        "gradient_roll": 1,
+                        "mirror": true,
+                        "modulate": true,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.99,
+                        "speed": 10
+                    },
+                    "type": "gradient"
+                },
+                "lava_lamp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "contrast": 0.6,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, #ff2800 0.00%,#800080 33.00%,#00c78c 66.00%,#00ff00 99.00%)",
+                        "gradient_roll": 10,
+                        "mirror": false,
+                        "reactivity": 0.9,
+                        "speed": 15
+                    },
+                    "type": "lava_lamp"
+                },
+                "runningDot": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "one way": false,
+                        "speed": 10
+                    },
+                    "type": "runningDot"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "running_lights"
+                }
+            },
+            "id": "front-left-to-right",
+            "is_device": false,
+            "segments": [
+                [
+                    "front01",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front02",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front03",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front04",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front05",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front06",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front07",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front08",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front09",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front10",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "mdi:led-strip-variant",
+                "mapping": "span",
+                "max_brightness": 1.0,
+                "name": "FRONT_MATRIX",
+                "preview_only": false,
+                "rows": 10,
+                "transition_mode": "Add",
+                "transition_time": 0.0
+            },
+            "effects": {
+                "bands": {
+                    "config": {
+                        "align": "left",
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "band_count": 10,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false
+                    },
+                    "type": "bands"
+                },
+                "bands_matrix": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "band_count": 6,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "flip_gradient": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false
+                    },
+                    "type": "bands_matrix"
+                },
+                "blocks": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "block_count": 4,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 4.4,
+                        "mirror": false
+                    },
+                    "type": "blocks"
+                },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "equalizer": {
+                    "config": {
+                        "align": "left",
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_repeat": 10,
+                        "gradient_roll": 0.0,
+                        "mirror": false
+                    },
+                    "type": "equalizer"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "speed": 0.5
+                    },
+                    "type": "fade"
+                },
+                "fire": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift": 0.15,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "intensity": 8,
+                        "mirror": false,
+                        "speed": 0.04
+                    },
+                    "type": "fire"
+                },
+                "gradient": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1.0
+                    },
+                    "type": "gradient"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "frequency": 1.0,
+                        "mirror": false,
+                        "speed": 7.7
+                    },
+                    "type": "rainbow"
+                },
+                "running_lights": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "direction": false,
+                        "flip": false,
+                        "length": 1.0,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "running_lights"
+                },
+                "strobe": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_decay": 2.0,
+                        "blur": 6.2,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "frequency": "1/4 (.o. )",
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_name": "Rainbow",
+                        "gradient_repeat": 1,
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "modulate": true,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.76,
+                        "single_color": true,
+                        "solid_color": false,
+                        "speed": 0.62,
+                        "strobe_decay": 1.5,
+                        "strobe_frequency": "1/2 (.-. )"
+                    },
+                    "type": "strobe"
+                }
+            },
+            "id": "front-matrix",
+            "is_device": false,
+            "segments": [
+                [
+                    "front01",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front02",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front03",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front04",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front05",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front06",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front07",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front08",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front09",
+                    0,
+                    29,
+                    false
+                ],
+                [
+                    "front10",
+                    0,
+                    29,
                     false
                 ]
             ]
