@@ -1,0 +1,1595 @@
+{
+    "audio": {
+        "audio_device": 9,
+        "delay_ms": 0,
+        "fft_size": 4096,
+        "mic_rate": 44100,
+        "min_volume": 0.2,
+        "sample_rate": 60
+    },
+    "configuration_version": "2.2.0",
+    "create_segments": false,
+    "dev_mode": false,
+    "devices": [
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.201",
+                "name": "Front01",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front01",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.202",
+                "name": "Front02",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front02",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.203",
+                "name": "Front03",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front03",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.204",
+                "name": "Front04",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front04",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.205",
+                "name": "Front05",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front05",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.206",
+                "name": "Front06",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front06",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.207",
+                "name": "Front07",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front07",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.208",
+                "name": "Front08",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front08",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.209",
+                "name": "Front09",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front09",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.210",
+                "name": "Front10",
+                "pixel_count": 30,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "UDP",
+                "timeout": 1
+            },
+            "id": "front10",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.101",
+                "name": "Overhead01",
+                "pixel_count": 300,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "DDP",
+                "timeout": 1
+            },
+            "id": "overhead01",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.102",
+                "name": "Overhead02",
+                "pixel_count": 300,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "DDP",
+                "timeout": 1
+            },
+            "id": "overhead02",
+            "type": "wled"
+        },
+        {
+            "config": {
+                "center_offset": 0,
+                "create_segments": false,
+                "icon_name": "wled",
+                "ip_address": "192.168.178.103",
+                "name": "Overhead03",
+                "pixel_count": 300,
+                "refresh_rate": 62,
+                "rgbw_led": false,
+                "sync_mode": "DDP",
+                "timeout": 1
+            },
+            "id": "overhead03",
+            "type": "wled"
+        }
+    ],
+    "global_brightness": 1.0,
+    "global_transitions": true,
+    "host": "0.0.0.0",
+    "integrations": [],
+    "melbanks": {
+        "max_frequencies": [
+            350,
+            2000,
+            15000
+        ],
+        "min_frequency": 20
+    },
+    "port": 8888,
+    "port_s": 8443,
+    "scan_on_startup": false,
+    "scenes": {
+        "strobebar": {
+            "name": "StrobeBar",
+            "scene_image": "Wallpaper",
+            "scene_midiactivate": null,
+            "scene_payload": null,
+            "scene_puturl": null,
+            "scene_tags": null,
+            "virtuals": {
+                "front01": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "front02": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "front03": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                },
+                "front04": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                },
+                "front05": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "front06": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "front07": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                },
+                "front08": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                },
+                "front09": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "front10": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "overhead01": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 6.0,
+                        "mirror": false,
+                        "speed": 3.0
+                    },
+                    "type": "fade"
+                },
+                "overhead02": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 6.0,
+                        "mirror": false,
+                        "speed": 3.0
+                    },
+                    "type": "fade"
+                },
+                "overhead03": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 6.0,
+                        "mirror": false,
+                        "speed": 3.0
+                    },
+                    "type": "fade"
+                }
+            }
+        }
+    },
+    "user_colors": {},
+    "user_gradients": {},
+    "user_presets": {},
+    "virtuals": [
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front01",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "None",
+                "transition_time": 0
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "beat_skip": "none",
+                    "blur": 0.0,
+                    "brightness": 0.5,
+                    "color_step": 0.125,
+                    "ease_method": "ease_out",
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "mode": "wipe",
+                    "skip_every": 1
+                },
+                "type": "bar"
+            },
+            "effects": {
+                "bands": {
+                    "config": {
+                        "align": "left",
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "band_count": 6,
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "mirror": false
+                    },
+                    "type": "bands"
+                },
+                "bands_matrix": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "band_count": 6,
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "flip_gradient": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "mirror": false
+                    },
+                    "type": "bands_matrix"
+                },
+                "bar": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "buildUp": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color": "#ff0000",
+                        "flip": false,
+                        "mirror": false,
+                        "speed": 1.0
+                    },
+                    "type": "buildUp"
+                },
+                "energy": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 4,
+                        "brightness": 1,
+                        "color_cycler": false,
+                        "color_high": "#0000ff",
+                        "color_lows": "#ff0000",
+                        "color_mids": "#00ff00",
+                        "flip": false,
+                        "mirror": true,
+                        "mixing_mode": "additive",
+                        "sensitivity": 0.6
+                    },
+                    "type": "energy"
+                },
+                "equalizer": {
+                    "config": {
+                        "align": "left",
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_repeat": 6,
+                        "gradient_roll": 0,
+                        "mirror": false
+                    },
+                    "type": "equalizer"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "gradient": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "mirror": false,
+                        "modulate": false,
+                        "modulation_effect": "sine",
+                        "modulation_speed": 0.5,
+                        "speed": 1
+                    },
+                    "type": "gradient"
+                },
+                "metro": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flash_color": "#ffffff",
+                        "flip": false,
+                        "mirror": false,
+                        "pulse_period": 1,
+                        "pulse_ratio": 0.3,
+                        "speed": 20,
+                        "steps": 4
+                    },
+                    "type": "metro"
+                },
+                "rainbow": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "frequency": 1,
+                        "mirror": false,
+                        "speed": 1
+                    },
+                    "type": "rainbow"
+                },
+                "scan_and_flare": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 3,
+                        "bounce": true,
+                        "brightness": 1,
+                        "color_intensity": true,
+                        "color_scan": "#ff0000",
+                        "flip": false,
+                        "frequency_range": "Lows (beat+bass)",
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0,
+                        "mirror": false,
+                        "multiplier": 3,
+                        "scan_width": 30,
+                        "sparkles_max": 10,
+                        "sparkles_size": 0.1,
+                        "sparkles_threshold": 0.6,
+                        "sparkles_time": 1,
+                        "speed": 78,
+                        "use_grad": false
+                    },
+                    "type": "scan_and_flare"
+                }
+            },
+            "id": "front01",
+            "is_device": "front01",
+            "segments": [
+                [
+                    "front01",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front02",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "beat_skip": "none",
+                    "blur": 0.0,
+                    "brightness": 0.5,
+                    "color_step": 0.125,
+                    "ease_method": "ease_out",
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "mode": "wipe",
+                    "skip_every": 1
+                },
+                "type": "bar"
+            },
+            "effects": {
+                "bar": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                }
+            },
+            "id": "front02",
+            "is_device": "front02",
+            "segments": [
+                [
+                    "front02",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front03",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "bass_strobe_decay_rate": 0.5,
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "color_shift_delay": 1.0,
+                    "color_step": 0.0625,
+                    "flip": false,
+                    "gradient": "Dancefloor",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "strobe_color": "#ff7800",
+                    "strobe_decay_rate": 0.5,
+                    "strobe_width": 15
+                },
+                "type": "real_strobe"
+            },
+            "effects": {
+                "real_strobe": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                },
+                "strobe": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_decay": 2.0,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_decay": 1.5,
+                        "strobe_frequency": "1/2 (.-. )"
+                    },
+                    "type": "strobe"
+                }
+            },
+            "id": "front03",
+            "is_device": "front03",
+            "segments": [
+                [
+                    "front03",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front04",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "bass_strobe_decay_rate": 0.5,
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "color_shift_delay": 1.0,
+                    "color_step": 0.0625,
+                    "flip": false,
+                    "gradient": "Dancefloor",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "strobe_color": "#ff7800",
+                    "strobe_decay_rate": 0.5,
+                    "strobe_width": 15
+                },
+                "type": "real_strobe"
+            },
+            "effects": {
+                "real_strobe": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                }
+            },
+            "id": "front04",
+            "is_device": "front04",
+            "segments": [
+                [
+                    "front04",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front05",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "beat_skip": "none",
+                    "blur": 0.0,
+                    "brightness": 0.5,
+                    "color_step": 0.125,
+                    "ease_method": "ease_out",
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "mode": "wipe",
+                    "skip_every": 1
+                },
+                "type": "bar"
+            },
+            "effects": {
+                "bar": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                }
+            },
+            "id": "front05",
+            "is_device": "front05",
+            "segments": [
+                [
+                    "front05",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front06",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "beat_skip": "none",
+                    "blur": 0.0,
+                    "brightness": 0.5,
+                    "color_step": 0.125,
+                    "ease_method": "ease_out",
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "mode": "wipe",
+                    "skip_every": 1
+                },
+                "type": "bar"
+            },
+            "effects": {
+                "bar": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                }
+            },
+            "id": "front06",
+            "is_device": "front06",
+            "segments": [
+                [
+                    "front06",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front07",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "bass_strobe_decay_rate": 0.5,
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "color_shift_delay": 1.0,
+                    "color_step": 0.0625,
+                    "flip": false,
+                    "gradient": "Dancefloor",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "strobe_color": "#ff7800",
+                    "strobe_decay_rate": 0.5,
+                    "strobe_width": 15
+                },
+                "type": "real_strobe"
+            },
+            "effects": {
+                "equalizer": {
+                    "config": {
+                        "align": "left",
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_repeat": 6,
+                        "gradient_roll": 0,
+                        "mirror": false
+                    },
+                    "type": "equalizer"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "metro": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flash_color": "#ffffff",
+                        "flip": false,
+                        "mirror": false,
+                        "pulse_period": 1,
+                        "pulse_ratio": 0.3,
+                        "speed": 20,
+                        "steps": 4
+                    },
+                    "type": "metro"
+                },
+                "real_strobe": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                }
+            },
+            "id": "front07",
+            "is_device": "front07",
+            "segments": [
+                [
+                    "front07",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front08",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "bass_strobe_decay_rate": 0.5,
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "color_shift_delay": 1.0,
+                    "color_step": 0.0625,
+                    "flip": false,
+                    "gradient": "Dancefloor",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "strobe_color": "#ff7800",
+                    "strobe_decay_rate": 0.5,
+                    "strobe_width": 15
+                },
+                "type": "real_strobe"
+            },
+            "effects": {
+                "real_strobe": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "bass_strobe_decay_rate": 0.5,
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "color_shift_delay": 1.0,
+                        "color_step": 0.0625,
+                        "flip": false,
+                        "gradient": "Dancefloor",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "strobe_color": "#ff7800",
+                        "strobe_decay_rate": 0.5,
+                        "strobe_width": 15
+                    },
+                    "type": "real_strobe"
+                }
+            },
+            "id": "front08",
+            "is_device": "front08",
+            "segments": [
+                [
+                    "front08",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front09",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "beat_skip": "none",
+                    "blur": 0.0,
+                    "brightness": 0.5,
+                    "color_step": 0.125,
+                    "ease_method": "ease_out",
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "mode": "wipe",
+                    "skip_every": 1
+                },
+                "type": "bar"
+            },
+            "effects": {
+                "bar": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                }
+            },
+            "id": "front09",
+            "is_device": "front09",
+            "segments": [
+                [
+                    "front09",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1,
+                "name": "Front10",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "beat_skip": "none",
+                    "blur": 0.0,
+                    "brightness": 0.5,
+                    "color_step": 0.125,
+                    "ease_method": "ease_out",
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 0.0,
+                    "mirror": false,
+                    "mode": "wipe",
+                    "skip_every": 1
+                },
+                "type": "bar"
+            },
+            "effects": {
+                "bar": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "beat_skip": "none",
+                        "blur": 0.0,
+                        "brightness": 0.5,
+                        "color_step": 0.125,
+                        "ease_method": "ease_out",
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 0.0,
+                        "mirror": false,
+                        "mode": "wipe",
+                        "skip_every": 1
+                    },
+                    "type": "bar"
+                },
+                "equalizer": {
+                    "config": {
+                        "align": "left",
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_repeat": 6,
+                        "gradient_roll": 0,
+                        "mirror": false
+                    },
+                    "type": "equalizer"
+                },
+                "fade": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 7.5,
+                        "mirror": false,
+                        "speed": 6.9
+                    },
+                    "type": "fade"
+                },
+                "metro": {
+                    "config": {
+                        "background_brightness": 1,
+                        "background_color": "#000000",
+                        "blur": 0,
+                        "brightness": 1,
+                        "flash_color": "#ffffff",
+                        "flip": false,
+                        "mirror": false,
+                        "pulse_period": 1,
+                        "pulse_ratio": 0.3,
+                        "speed": 20,
+                        "steps": 4
+                    },
+                    "type": "metro"
+                }
+            },
+            "id": "front10",
+            "is_device": "front10",
+            "segments": [
+                [
+                    "front10",
+                    0,
+                    29,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1.0,
+                "name": "Overhead01",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 6.0,
+                    "mirror": false,
+                    "speed": 3.0
+                },
+                "type": "fade"
+            },
+            "effects": {
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 6.0,
+                        "mirror": false,
+                        "speed": 3.0
+                    },
+                    "type": "fade"
+                }
+            },
+            "id": "overhead01",
+            "is_device": "overhead01",
+            "segments": [
+                [
+                    "overhead01",
+                    0,
+                    299,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1.0,
+                "name": "Overhead02",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 6.0,
+                    "mirror": false,
+                    "speed": 3.0
+                },
+                "type": "fade"
+            },
+            "effects": {
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 6.0,
+                        "mirror": false,
+                        "speed": 3.0
+                    },
+                    "type": "fade"
+                }
+            },
+            "id": "overhead02",
+            "is_device": "overhead02",
+            "segments": [
+                [
+                    "overhead02",
+                    0,
+                    299,
+                    false
+                ]
+            ]
+        },
+        {
+            "auto_generated": false,
+            "config": {
+                "center_offset": 0,
+                "frequency_max": 15000,
+                "frequency_min": 20,
+                "icon_name": "wled",
+                "mapping": "span",
+                "max_brightness": 1.0,
+                "name": "Overhead03",
+                "preview_only": false,
+                "rows": 1,
+                "transition_mode": "Add",
+                "transition_time": 0.4
+            },
+            "effect": {
+                "config": {
+                    "background_brightness": 1.0,
+                    "background_color": "#000000",
+                    "blur": 0.0,
+                    "brightness": 1.0,
+                    "flip": false,
+                    "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                    "gradient_roll": 6.0,
+                    "mirror": false,
+                    "speed": 3.0
+                },
+                "type": "fade"
+            },
+            "effects": {
+                "fade": {
+                    "config": {
+                        "background_brightness": 1.0,
+                        "background_color": "#000000",
+                        "blur": 0.0,
+                        "brightness": 1.0,
+                        "flip": false,
+                        "gradient": "linear-gradient(90deg, rgb(255, 0, 0) 0%, rgb(255, 120, 0) 14%, rgb(255, 200, 0) 28%, rgb(0, 255, 0) 42%, rgb(0, 199, 140) 56%, rgb(0, 0, 255) 70%, rgb(128, 0, 128) 84%, rgb(255, 0, 178) 98%)",
+                        "gradient_roll": 6.0,
+                        "mirror": false,
+                        "speed": 3.0
+                    },
+                    "type": "fade"
+                }
+            },
+            "id": "overhead03",
+            "is_device": "overhead03",
+            "segments": [
+                [
+                    "overhead03",
+                    0,
+                    299,
+                    false
+                ]
+            ]
+        }
+    ],
+    "visualisation_fps": 30,
+    "visualisation_maxlen": 50,
+    "wled_preferences": {
+        "dmx_address_start": {
+            "setting": 1,
+            "user_enabled": false
+        },
+        "force_max_brightness": {
+            "setting": false,
+            "user_enabled": false
+        },
+        "inactivity_timeout": {
+            "setting": 1,
+            "user_enabled": false
+        },
+        "realtime_dmx_mode": {
+            "setting": "MultiRGB",
+            "user_enabled": false
+        },
+        "realtime_gamma_enabled": {
+            "setting": false,
+            "user_enabled": false
+        },
+        "start_universe_setting": {
+            "setting": 1,
+            "user_enabled": false
+        },
+        "wled_preferred_mode": {
+            "setting": "UDP",
+            "user_enabled": false
+        }
+    }
+}

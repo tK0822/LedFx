@@ -10,8 +10,8 @@ from pkg_resources import parse_version
 
 from ledfx.consts import CONFIGURATION_VERSION
 
-CONFIG_DIRECTORY = ".ledfx"
-CONFIG_FILE_NAME = "config.json"
+CONFIG_DIRECTORY = "LedFx/config"
+CONFIG_FILE_NAME = "config_brandy_2023.json"
 PRESETS_FILE_NAME = "presets.json"
 
 PRIVATE_KEY_FILE = "privkey.pem"
