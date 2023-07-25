@@ -3,15 +3,19 @@ import voluptuous as vol
 
 from ledfx.color import parse_color, validate_color, LEDFX_COLORS
 from ledfx.effects.temporal import TemporalEffect
+from ledfx.effects.gradient import GradientEffect
 
 
-class RunningLights(TemporalEffect):
+
+class RunningLights(TemporalEffect, GradientEffect):
     NAME = "Running Lights"
     CATEGORY = "Non-Reactive"
 
     _color = None
     _forward = True
     _position = 0
+    _gradient_idx = 0
+    _gradient_samples = 200
 
     CONFIG_SCHEMA = vol.Schema(
         {
@@ -26,11 +30,20 @@ class RunningLights(TemporalEffect):
             vol.Optional(
                 "length", description="Wave Length", default=1
             ): vol.All(vol.Coerce(float), vol.Range(min=1, max=30)),
+
+            vol.Optional(
+                "color rate",
+                default=2,
+                description="Color change rate",
+            ): vol.All(vol.Coerce(int), vol.Range(min=1, max=20)),
+
         },
     )
 
     def config_updated(self, config):
-        self._color = np.array(parse_color(self._config["color"]), dtype=float)
+        self._gradient_idx = 0
+        self._forward = True
+        self._assert_gradient()
         self._idx = 0
 
     def on_activate(self, pixel_count):
@@ -44,7 +57,33 @@ class RunningLights(TemporalEffect):
 
         return np.array([r, g, b], dtype=float)
     
+    def _assert_gradient(self):
+        if (
+            self._gradient_curve is None  # Uninitialized gradient
+            or len(self._gradient_curve[0])
+            !=self._gradient_samples  # Incorrect size
+        ):
+            self._generate_gradient_curve(
+                self._config["gradient"],
+                self._gradient_samples,
+            )
+    
     def effect_loop(self):
+        
+        # Get gradient color
+        if self._forward:
+            self._gradient_idx += self._config["color rate"]
+        else:
+            self._gradient_idx -= self._config["color rate"]
+
+        if self._gradient_idx >= self._gradient_samples:
+            self._gradient_idx = self._gradient_samples - 1
+            self._forward = not self._forward
+        elif self._gradient_idx <= 0:
+            self._gradient_idx = 0
+            self._forward = not self._forward
+
+        self._color = self._gradient_curve[:, self._gradient_idx]
 
         if self._position < self.pixel_count * 2:
             self._position += 1
