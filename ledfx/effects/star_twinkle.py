@@ -47,8 +47,7 @@ class StarTwinkle(TemporalEffect, GradientEffect):
     def on_activate(self, pixel_count):
         self._color = self.get_gradient_color(0)
     
-    @staticmethod
-    def _fade_to_black(fade_value: float, curr_color: np.ndarray):
+    def _fade_to_black(self, fade_value: float, curr_color: np.ndarray):
 
         r = 0 if curr_color[0] <= 5 else curr_color[0] - (curr_color[0] * fade_value / 256)
         g = 0 if curr_color[1] <= 5 else curr_color[1] - (curr_color[1] * fade_value / 256)
