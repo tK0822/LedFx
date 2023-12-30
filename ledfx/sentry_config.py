@@ -1,24 +1,19 @@
+import logging
+import os
+
 import sentry_sdk
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
-from ledfx.consts import DEV, PROJECT_VERSION
+from ledfx.consts import PROJECT_VERSION
 
-# Place your key between the quotes if you have a sentry.io account and wish to use it.
-# Otherwise the LedFx sentry key is inserted here during deployment.
+_LOGGER = logging.getLogger(__name__)
 
-sentry_dsn = "DSN"
-if (
-    sentry_dsn
-    == "https://691086dc41fa4218860be6ed4c888145@o482797.ingest.sentry.io/5533553"
-):
-    sentry_sdk.init(
-        sentry_dsn,
-        traces_sample_rate=1,
-        integrations=[AioHttpIntegration()],
-        release=f"ledfx@{PROJECT_VERSION}",
-    )
-elif DEV > 0:
-    sentry_dsn = "https://de9ea3e00f334954b2f1478b90936d55@o482797.ingest.sentry.io/5886499"
+
+is_release = os.getenv("IS_RELEASE", "false").lower()
+
+if is_release == "false":
+    sentry_dsn = "https://b192934eebd517c86bf7e9c512b3888a@o482797.ingest.sentry.io/4506350241841152"
+    sample_rate = 1
 
     from subprocess import PIPE, Popen
 
@@ -26,10 +21,19 @@ elif DEV > 0:
     (commit_hash, err) = process.communicate()
     commit_hash = commit_hash[:7].decode("utf-8")
     exit_code = process.wait()
+    release = f"ledfx@{PROJECT_VERSION}-{commit_hash}"
+else:
+    # production / release behaviour due to injection of "prod" or anything really into ENVIRONMENT env variable
+    sentry_dsn = "https://dc6070345a8dfa1f2f24433d16f7a133@o482797.ingest.sentry.io/4506350233321472"
+    sample_rate = 0
+    release = f"ledfx@{PROJECT_VERSION}"
 
-    sentry_sdk.init(
-        sentry_dsn,
-        traces_sample_rate=1,
-        integrations=[AioHttpIntegration()],
-        release=f"ledfx@{PROJECT_VERSION}-{commit_hash}",
-    )
+_LOGGER.info(
+    f"Sentry config\ndsn first ten: {sentry_dsn[8:18]}\nsample_rate: {sample_rate}\nrelease: {release}"
+)
+sentry_sdk.init(
+    sentry_dsn,
+    traces_sample_rate=sample_rate,
+    integrations=[AioHttpIntegration()],
+    release=release,
+)

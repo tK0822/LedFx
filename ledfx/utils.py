@@ -11,6 +11,7 @@ import socket
 import sys
 import time
 import timeit
+import urllib.request
 from abc import ABC
 from collections import deque
 from collections.abc import MutableMapping
@@ -21,10 +22,13 @@ from itertools import chain
 from subprocess import PIPE, Popen
 
 import numpy as np
+import PIL.Image as Image
+import PIL.ImageFont as ImageFont
 import requests
 import voluptuous as vol
 
 from ledfx.config import save_config
+from ledfx.consts import LEDFX_ASSETS_PATH
 
 # from asyncio import coroutines, ensure_future
 
@@ -184,7 +188,7 @@ def async_fire_and_return(coro, callback, timeout=10):
         exc = future.exception()
         if exc:
             # Handle wonderful empty TimeoutError exception
-            if type(exc) == TimeoutError:
+            if isinstance(exc, TimeoutError):
                 _LOGGER.warning(f"Coroutine {future} timed out.")
             else:
                 _LOGGER.error(exc)
@@ -559,23 +563,24 @@ def currently_frozen():
 
 
 def get_icon_path(icon_filename) -> str:
-    """returns fully qualified path for icon, tests for frozen
-    and logs error if does not exist
+    """Returns fully qualified path for the tray icon
+    Assumes that the file is within ledfx_assets folder
+
 
     Parameters:
-        icon_filename(str): the filename of the icon to be pathed
+        icon_filename(str): the filename of the icon
 
     Returns:
             icon_location(str): fully qualified path
     """
-    current_directory = os.path.dirname(__file__)
 
     icon_location = os.path.normpath(
-        os.path.join(current_directory, "..", "icons", icon_filename)
+        os.path.join(LEDFX_ASSETS_PATH, icon_filename)
     )
 
     if not os.path.isfile(icon_location):
         _LOGGER.error(f"No icon found at {icon_location}")
+
     return icon_location
 
 
@@ -1168,3 +1173,123 @@ def wled_support_DDP(build) -> bool:
         return True
     else:
         return False
+
+
+def clean_ip(ip_address):
+    """Strip common error input from IP copy from chrome that is actually a URL
+
+    Args:
+        ip_address (string): The IP address to be cleaned
+
+    Returns:
+        string: The cleaned IP address
+    """
+
+    return (
+        ip_address.replace("https://", "")
+        .replace("http://", "")
+        .replace("/", "")
+    )
+
+
+name_to_icon = {}
+
+
+def set_name_to_icon(new_dict):
+    global name_to_icon
+    name_to_icon = new_dict
+
+
+def get_icon_name(wled_name):
+    global name_to_icon
+    for name, icon in name_to_icon.items():
+        if name.lower() in wled_name.lower():
+            return icon
+    return "wled"
+
+
+def extract_positive_integers(s):
+    # Use regular expression to find all sequences of digits
+    numbers = re.findall(r"\d+", s)
+
+    # Convert each found sequence to an integer and filter out non-positive numbers
+    return [int(num) for num in numbers if int(num) >= 0]
+
+
+def remove_values_above_limit(numbers, limit):
+    # Keep only values that are less than or equal to the limit
+    return [num for num in numbers if num <= limit]
+
+
+def open_gif(gif_path):
+    """
+    Open a gif from a local file or url
+
+    Args:
+        gif_path: str
+            path to gif file or url
+    Returns:
+        Image: PIL Image object or None if failed to open
+    """
+    current_directory = os.path.dirname(__file__)
+    absolute_directory = os.path.abspath(current_directory)
+    _LOGGER.debug(
+        f"open_gif cur: {current_directory} abs: {absolute_directory}"
+    )
+
+    try:
+        if gif_path.startswith("http://") or gif_path.startswith("https://"):
+            with urllib.request.urlopen(gif_path) as url:
+                return Image.open(url)
+        else:
+            return Image.open(gif_path)  # Directly open for local files
+    except Exception as e:
+        _LOGGER.warning(f"Failed to open gif : {gif_path} : {e}")
+        return None
+
+
+def get_mono_font(size):
+    """
+    Get a monospace font from a list of fonts common across platforms
+
+    Args:
+        size: int
+            font size in points
+    Returns:
+        font: ImageFont
+    """
+
+    font_names = [
+        "Courier New",
+        "cour.ttf",
+        "DejaVu Sans Mono",
+        "DejaVuSansMono.ttf",
+        "DejaVuSansMono-Regular.ttf",
+        "Liberation Mono",
+        "LiberationMono-Regular.ttf",
+        "Consolas",
+        "consola.ttf",
+        "monospace",
+    ]
+    return get_font(font_names, size)
+
+
+def get_font(font_list, size):
+    """
+    Get the first font from a list of fonts that is available on the system
+
+    Args:
+        font_list: list
+            list of font name str to try
+        size: int
+            font size in points
+    """
+
+    for font_name in font_list:
+        try:
+            font = ImageFont.truetype(font_name, size)
+            _LOGGER.info(f"Found font: {font_name}")
+            return font
+        except OSError:
+            continue
+    raise RuntimeError("None of the fonts are available on the system.")

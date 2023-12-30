@@ -22,18 +22,26 @@ class DummyEffect:
 
     def __init__(self, pixel_count):
         self.pixels = np.zeros((pixel_count, 3))
+        self.pixel_count = pixel_count
 
     def _render(self):
-        pass
+        # we don't need a self.lock as we don't do anything in deactivate
+        # self.pixels will be valid while this instance is in scope
+        self.render()
 
     def render(self):
-        pass
+        # we need to clear this each render frame as transitions reuse
+        # active effect pixel space
+        self.pixels = np.zeros((self.pixel_count, 3))
 
     def get_pixels(self):
         return self.pixels
 
     def activate(self):
         pass
+
+    def _deactivate(self):
+        self.deactivate()
 
     def deactivate(self):
         pass
@@ -246,14 +254,15 @@ class Effect(BaseRegistry):
     def __init__(self, ledfx, config):
         self._ledfx = ledfx
         self._config = {}
-        self.update_config(config)
         self.lock = threading.Lock()
+        self.update_config(config)
 
     def __del__(self):
         if self._active:
-            self.deactivate()
+            self._deactivate()
 
     def activate(self, virtual):
+        self.lock.acquire()
         """Attaches an output channel to the effect"""
         self._virtual = virtual
         self.pixels = np.zeros((virtual.pixel_count, 3))
@@ -266,18 +275,24 @@ class Effect(BaseRegistry):
                 base.on_activate(self, virtual.pixel_count)
 
         self._active = True
+        self.lock.release()
         _LOGGER.info(f"Effect {self.NAME} activated.")
+
+    def _deactivate(self):
+        # we need this wrapper to ensure the full chain of
+        # deactivation is protected
+        self.lock.acquire()
+        self.deactivate()
+        self.lock.release()
 
     def deactivate(self):
         """Detaches an output channel from the effect"""
         self.pixels = None
         self._active = False
-
         _LOGGER.info(f"Effect {self.NAME} deactivated.")
 
     def update_config(self, config):
-        # TODO: Sync locks to ensure everything is thread safe
-
+        self.lock.acquire()
         validated_config = type(self).schema()(config)
         prior_config = self._config
 
@@ -303,6 +318,7 @@ class Effect(BaseRegistry):
         for base in valid_classes:
             if base.config_updated != super(base, base).config_updated:
                 base.config_updated(self, self._config)
+        self.lock.release()
 
         _LOGGER.debug(
             f"Effect {self.NAME} config updated to {validated_config}."
@@ -319,7 +335,9 @@ class Effect(BaseRegistry):
 
     def _render(self):
         self.lock.acquire()
-        self.render()
+        # its possible we were waiting on the effect being deactivated
+        if self._active:
+            self.render()
         self.lock.release()
 
     def render(self):
@@ -332,43 +350,54 @@ class Effect(BaseRegistry):
         pass
 
     def get_pixels(self):
-        if not hasattr(self, "pixels"):
-            return
+        self.lock.acquire()
+        pixels = None
+        if hasattr(self, "pixels"):
+            if self.pixels is not None:
+                pixels = np.copy(self.pixels)
+                # Grab the config and store it here for use in the function - we use it a lot
+                config = self._config
 
-        pixels = np.copy(self.pixels)
-        # Grab the config and store it here for use in the function - we use it a lot
-        config = self._config
+                # Apply some of the base output filters if necessary
+                if config["flip"]:
+                    pixels = np.flipud(pixels)
+                if config["mirror"]:
+                    pixels = np.concatenate(
+                        (pixels[-1 + len(pixels) % -2 :: -2], pixels[::2])
+                    )
+                if config["background_color"]:
+                    pixels += self._bg_color
+                if config["brightness"] is not None:
+                    np.multiply(
+                        pixels,
+                        config["brightness"],
+                        out=pixels,
+                        casting="unsafe",
+                    )
 
-        # Apply some of the base output filters if necessary
-        if config["flip"]:
-            pixels = np.flipud(pixels)
-        if config["mirror"]:
-            pixels = np.concatenate(
-                (pixels[-1 + len(pixels) % -2 :: -2], pixels[::2])
-            )
-        if config["background_color"]:
-            pixels += self._bg_color
-        if config["brightness"] is not None:
-            np.multiply(
-                pixels, config["brightness"], out=pixels, casting="unsafe"
-            )
+                # If the configured blur is greater than 0 and pixel_count > 3, apply blur
+                # The matrix math requires > 3 pixels to work properly
+                # And blurring with a less than 3 pixels seems... redundant
+                # TODO: Handle RGBW properly
+                if config["blur"] != 0.0 and self.pixel_count > 3:
+                    kernel = _gaussian_kernel1d(config["blur"], 0, len(pixels))
 
-        # If the configured blur is greater than 0 and pixel_count > 3, apply blur
-        # The matrix math requires > 3 pixels to work properly
-        # And blurring with a less than 3 pixels seems... redundant
-        # TODO: Handle RGBW properly
-        if config["blur"] != 0.0 and self.pixel_count > 3:
-            kernel = _gaussian_kernel1d(config["blur"], 0, len(pixels))
+                    # Blur the R,G,B portions of the pixel array
+                    # Lots of attempts at vectorisation/performance improvements here
+                    # This appears to be optimal from a readability/performance point of view
+                    # TODO: If we ever move to RGBW pixel arrays, uncomment the last line to operate on the W portion
 
-            # Blur the R,G,B portions of the pixel array
-            # Lots of attempts at vectorisation/performance improvements here
-            # This appears to be optimal from a readability/performance point of view
-            # TODO: If we ever move to RGBW pixel arrays, uncomment the last line to operate on the W portion
-
-            pixels[:, 0] = np.convolve(pixels[:, 0], kernel, mode="same")  # R
-            pixels[:, 1] = np.convolve(pixels[:, 1], kernel, mode="same")  # G
-            pixels[:, 2] = np.convolve(pixels[:, 2], kernel, mode="same")  # B
-            # pixels[:, 3] = np.convolve(pixels[:, 3], kernel, mode="same") # W
+                    pixels[:, 0] = np.convolve(
+                        pixels[:, 0], kernel, mode="same"
+                    )  # R
+                    pixels[:, 1] = np.convolve(
+                        pixels[:, 1], kernel, mode="same"
+                    )  # G
+                    pixels[:, 2] = np.convolve(
+                        pixels[:, 2], kernel, mode="same"
+                    )  # B
+                    # pixels[:, 3] = np.convolve(pixels[:, 3], kernel, mode="same") # W
+        self.lock.release()
         return pixels
 
     @property

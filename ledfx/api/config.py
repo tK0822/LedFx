@@ -17,7 +17,7 @@ CORE_CONFIG_KEYS = set(map(str, CORE_CONFIG_SCHEMA.schema.keys()))
 
 def validate_and_trim_config(config, schema, node):
     for key in config.keys():
-        if key not in PERMITTED_KEYS[node]:
+        if key not in PERMITTED_KEYS[node] and key != "user_presets":
             raise KeyError(f"Unknown/forbidden {node} config key: '{key}'")
 
     validated_config = schema(config)
@@ -40,11 +40,7 @@ class ConfigEndpoint(RestEndpoint):
             try:
                 wanted_keys = await request.json()
             except JSONDecodeError:
-                response = {
-                    "status": "failed",
-                    "reason": "JSON Decoding failed",
-                }
-                return web.json_response(data=response, status=400)
+                return await self.json_decode_error()
 
             if isinstance(wanted_keys, list):
                 keys.update(wanted_keys)
@@ -129,11 +125,7 @@ class ConfigEndpoint(RestEndpoint):
             return web.json_response(data={"status": "success"}, status=200)
 
         except JSONDecodeError:
-            response = {
-                "status": "failed",
-                "reason": "JSON Decoding failed",
-            }
-            return web.json_response(data=response, status=400)
+            return await self.json_decode_error()
         except vol.MultipleInvalid as msg:
             response = {
                 "status": "failed",
@@ -198,7 +190,14 @@ class ConfigEndpoint(RestEndpoint):
             if core_config and not (
                 any(
                     key in core_config
-                    for key in ["global_brightness", "create_segments"]
+                    for key in [
+                        "global_brightness",
+                        "create_segments",
+                        "scan_on_startup",
+                        "user_presets",
+                        "transmission_mode",
+                        "visualisation_maxlen",
+                    ]
                 )
                 and len(core_config) == 1
             ):
@@ -212,11 +211,7 @@ class ConfigEndpoint(RestEndpoint):
             return web.json_response(data={"status": "success"}, status=200)
 
         except JSONDecodeError:
-            response = {
-                "status": "failed",
-                "reason": "JSON Decoding failed",
-            }
-            return web.json_response(data=response, status=400)
+            return await self.json_decode_error()
 
         except (KeyError, vol.MultipleInvalid) as msg:
             response = {

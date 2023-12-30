@@ -5,6 +5,7 @@ from aiohttp import web
 
 from ledfx.api import RestEndpoint
 from ledfx.config import save_config
+from ledfx.effects import DummyEffect
 from ledfx.utils import generate_id
 
 _LOGGER = logging.getLogger(__name__)
@@ -32,7 +33,10 @@ class VirtualsEndpoint(RestEndpoint):
                 "active": virtual.active,
                 "effect": {},
             }
-            if virtual.active_effect:
+            # TODO: protect from DummyEffect, future consider side effects
+            if virtual.active_effect and not isinstance(
+                virtual.active_effect, DummyEffect
+            ):
                 effect_response = {}
                 effect_response["config"] = virtual.active_effect.config
                 effect_response["name"] = virtual.active_effect.name
@@ -61,11 +65,7 @@ class VirtualsEndpoint(RestEndpoint):
         try:
             data = await request.json()
         except JSONDecodeError:
-            response = {
-                "status": "failed",
-                "reason": "JSON Decoding failed",
-            }
-            return web.json_response(data=response, status=400)
+            return await self.json_decode_error()
 
         virtual_config = data.get("config")
         if virtual_config is None:
@@ -85,7 +85,7 @@ class VirtualsEndpoint(RestEndpoint):
                     "status": "failed",
                     "reason": f"Virtual with ID {virtual_id} not found",
                 }
-                return web.json_response(data=response, status=404)
+                return web.json_response(data=response, status=400)
             # Update the virtual's configuration
             virtual.config = virtual_config
             _LOGGER.info(

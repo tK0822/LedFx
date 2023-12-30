@@ -18,7 +18,9 @@ from ledfx.utils import (
     BaseRegistry,
     RegistryLoader,
     async_fire_and_forget,
+    clean_ip,
     generate_id,
+    get_icon_name,
     resolve_destination,
     wled_support_DDP,
 )
@@ -140,7 +142,10 @@ class Device(BaseRegistry):
         for pixels, start, end in data:
             # protect against an empty race condition
             if pixels.shape[0] != 0:
-                self._pixels[start : end + 1] = pixels
+                if np.shape(pixels) == (3,) or np.shape(
+                    self._pixels[start : end + 1]
+                ) == np.shape(pixels):
+                    self._pixels[start : end + 1] = pixels
 
         if self.priority_virtual:
             if virtual_id == self.priority_virtual.id:
@@ -274,6 +279,8 @@ class Device(BaseRegistry):
         _LOGGER.debug(
             f"Device {self.id}: Added segment {virtual_id, start_pixel, end_pixel}"
         )
+        # We have added a segment, therefore the priority virtual may of changed
+        self.invalidate_cached_props()
 
     def clear_virtual_segments(self, virtual_id):
         self._segments = [
@@ -382,9 +389,12 @@ class Device(BaseRegistry):
         compound_name = f"{self.name}-{name}"
         _LOGGER.info(f"Creating a virtual for device {compound_name}")
         virtual_id = generate_id(compound_name)
+        icon_name = get_icon_name(compound_name)
+        if icon_name == "wled" and icon is not None:
+            icon_name = icon
         virtual_config = {
             "name": compound_name,
-            "icon_name": icon,
+            "icon_name": icon_name,
             "transition_time": 0,
             "rows": rows,
         }
@@ -619,6 +629,7 @@ class Devices(RegistryLoader):
         """
         # First, we try to make sure this device doesn't share a destination with any existing device
         if "ip_address" in device_config.keys():
+            device_config["ip_address"] = clean_ip(device_config["ip_address"])
             device_ip = device_config["ip_address"]
             try:
                 resolved_dest = await resolve_destination(
@@ -653,6 +664,15 @@ class Devices(RegistryLoader):
                             msg = f"Ignoring {device_ip}: Shares IP and OpenRGB ID with existing device {existing_device.name}"
                             _LOGGER.info(msg)
                             raise ValueError(msg)
+                    elif device_type == "osc":
+                        # Allow multiple OSC Server devices, but not on the same path + starting_addr combination
+                        if (
+                            device_config["path"]
+                            == existing_device.config["path"]
+                            and device_config["starting_addr"]
+                            == existing_device.config["starting_addr"]
+                        ):
+                            msg = f"Ignoring {device_ip}:{device_config['port']}:{device_config['path']}/{device_config['starting_addr']}: Shares IP, Port, Universe AND starting address with existing device {existing_device.name}"
                     else:
                         msg = f"Ignoring {device_ip}: Shares destination with existing device {existing_device.name}"
                         _LOGGER.info(msg)
@@ -689,10 +709,12 @@ class Devices(RegistryLoader):
                 )
                 sync_mode = "UDP"
 
+            icon_name = get_icon_name(wled_name)
+
             wled_config = {
                 "name": wled_name,
                 "pixel_count": wled_count,
-                "icon_name": "wled",
+                "icon_name": icon_name,
                 "rgbw_led": wled_rgbmode,
                 "sync_mode": sync_mode,
             }
@@ -703,9 +725,7 @@ class Devices(RegistryLoader):
 
         # Create the device
         _LOGGER.info(
-            "Adding device of type {} with config {}".format(
-                device_type, device_config
-            )
+            f"Adding device of type {device_type} with config {device_config}"
         )
         device = self._ledfx.devices.create(
             id=device_id,
@@ -736,6 +756,12 @@ class Devices(RegistryLoader):
             "name": device.name,
             "icon_name": device_config["icon_name"],
         }
+
+        if device_type == "wled":
+            if "matrix" in led_info.keys():
+                if "h" in led_info["matrix"].keys():
+                    virtual_config["rows"] = led_info["matrix"]["h"]
+
         segments = [[device.id, 0, device_config["pixel_count"] - 1, False]]
 
         # Create the virtual
@@ -787,13 +813,11 @@ class Devices(RegistryLoader):
         # Service Discovery Library
         _LOGGER.info("Scanning for WLED devices...")
         wled_listener = WLEDListener(self._ledfx)
-        wledbrowser = self._zeroconf.add_service_listener(
-            "_wled._tcp.local.", wled_listener
-        )
+        self._zeroconf.add_service_listener("_wled._tcp.local.", wled_listener)
         try:
             await asyncio.sleep(30)
         finally:
-            _LOGGER.info("Scan Finished")
+            _LOGGER.info("WLED device scan finished!")
             self._zeroconf.remove_service_listener(wled_listener)
 
 
@@ -809,7 +833,7 @@ class WLEDListener(zeroconf.ServiceBrowser):
 
         if info:
             hostname = str(info.server).rstrip(".")
-            _LOGGER.info(f"Found device: {hostname}")
+            _LOGGER.info(f"Found WLED device: {hostname}")
 
             device_type = "wled"
             device_config = {"ip_address": hostname}

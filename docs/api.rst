@@ -286,6 +286,124 @@ example:
         "error": "timed out"
     }
 
+/api/get_nanoleaf_token
+=========================
+
+.. rubric:: POST
+
+REST end-point for requesting auth token from Nanoleaf.
+Ensure that the Nanoleaf controller is in pairing mode.
+Long press the power button on the controller for 5-7 seconds.
+White LEDs will scan back and forth to indicate pairing mode.
+
+Returns the auth token as a string
+
+.. code-block:: json
+
+    {
+        "auth_token":"N7knmECvfRjoBlahBlah1Gsn5K5HcxHy"
+    }
+
+If the Nanoleaf controller is present but not in pairing mode will return an error message
+
+.. code-block:: json
+
+    {
+        "error":"{ip}:{port}: Ensure Nanoleaf controller is in pairing mode"
+    }
+
+
+/api/get_gif_frames
+===========================================
+
+Overview
+--------
+
+A RESTful endpoint designed for extracting and returning individual frames from a GIF image. Clients can request frames by providing either the URL or the local file path of the GIF resource. The frames are returned in JPEG format for efficient data transmission.
+
+Endpoint Details
+----------------
+
+- **Endpoint Path**: ``/api/get_gif_frames``
+
+Request
+-------
+
+- **Method**: GET
+- **Request Data**:
+  - ``path_url`` (String): The URL or local file path of the GIF image from which frames are to be extracted.
+
+Response
+--------
+
+- **Success**:
+
+  - Status Code: 200
+
+  - Body:
+
+    - ``frame_count`` (Integer): The number of frames extracted from the GIF.
+    - ``frames`` (List): A list of base64 encoded strings, each representing a frame in JPEG format.
+
+- **Failure**:
+
+  - Status Code: 400 (Bad Request)
+
+    - When JSON decoding fails or the required attribute ``path_url`` is not provided.
+
+  - Status Code: 404 (Not Found)
+
+    - When the GIF image at the specified URL or file path cannot be opened or processed.
+
+Error Handling
+--------------
+
+In case of an error, the endpoint returns a JSON object with the following structure:
+
+.. code-block:: json
+
+    {
+      "status": "failed",
+      "reason": "<error reason>"
+    }
+
+Usage Example
+-------------
+
+Requesting GIF Frames
+^^^^^^^^^^^^^^^^^^^^^
+
+To request frames from a GIF image, send a GET request with either the URL or local file path in the request data:
+
+.. code-block:: json
+
+    {
+      "path_url": "http://example.com/image.gif"
+    }
+
+Or, for a local file:
+
+.. code-block:: json
+
+    {
+      "path_url": "/path/to/local/image.gif"
+    }
+
+Sample Response
+^^^^^^^^^^^^^^^
+
+A successful response with two extracted frames might look like this:
+
+.. code-block:: json
+
+    {
+      "frame_count": 2,
+      "frames": [
+        "<base64-encoded JPEG data>",
+        "<base64-encoded JPEG data>"
+      ]
+    }
+
 /api/effects
 =========================
 
@@ -461,7 +579,7 @@ Extensible support for general tools towards ALL virtuals in one call
 
 .. rubric:: PUT
 
-Supports tool instances of currently only force_color, others may be added in the future
+Supports tool instances of currently only force_color and oneshot, others may be added in the future
 
 **force_color**
 
@@ -489,6 +607,38 @@ returns
     {
         "status": "success",
         "tool": "force_color"
+    }
+
+**oneshot**
+
+| Fill all active virtuals with a single color in a defined envelope of timing
+| Intended to allow integration of instantaneous game effects over all active virtual
+| Repeated oneshot will overwrite the previous oneshot if has not finished
+
+| color: The color to which we wish to fill the virtual, any format supported
+| ramp: The time in ms over which to ramp the color from zero to full weight over the active effect
+| hold: The time in ms to hold the color to full weight over the active effect
+| fade: The time in ms to fade the color from full weight to zero over the active effect
+
+At least one of ramp, hold or fade must be specified
+
+.. code-block:: json
+
+    {
+        "tool":"oneshot",
+        "color":"white",
+        "ramp":10,
+        "hold":200,
+        "fade":2000
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "oneshot"
     }
 
 /api/virtuals_tools/<virtual_id>
@@ -498,7 +648,7 @@ Extensible support for general tools towards a specified virtual
 
 .. rubric:: PUT
 
-Supports tool instances of currently only force_color, others may be added in the future
+Supports tool instances of force_color, calibration, highlight and oneshot others may be added in the future
 
 **force_color**
 
@@ -526,6 +676,121 @@ returns
     {
         "status": "success",
         "tool": "force_color"
+    }
+
+**calibration**
+
+| Force virtual into calibration mode
+| All segments will be switched to solid color rotation of RGBCMY on the final devices
+| Device backgrounds will be set to black
+| Changes to virtual segments in edit virtual will be displayed on browser second tab if open on devices view and physical devices live
+| Setting is not persistant. Shutting down ledfx while in calibration mode will leave virtual in normal effect settings in next cycle
+
+Enter calibration mode with
+
+.. code-block:: json
+
+    {
+      "tool": "calibration",
+      "mode": "on"
+    }
+
+Exit calibration mode with
+
+.. code-block:: json
+
+    {
+      "tool": "calibration",
+      "mode": "off"
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "calibration"
+    }
+
+**highlight**
+
+| Highlight a segment of a virtual with white, use for editing of virtual segmentations in calibration mode
+| Intended to highlight the last edited segment, or last reordered segment
+
+| state: defaults to true, explicity send False to turn off highlight
+| device: device id of the device which the segment is to be highlighted on, forced to lower case
+| start: index of led start on device for highlight
+| stop: index of led stop on device for highlight
+| flip: render order inversion, default to false
+
+.. code-block:: json
+
+    {
+      "tool": "highlight",
+      "device": "falcon1",
+      "start": 2019,
+      "stop": 2451,
+      "flip": true
+    }
+
+Disable highlight
+
+.. code-block:: json
+
+    {
+      "tool": "highlight",
+      "state": false
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "highlight"
+    }
+
+**oneshot**
+
+| Fill the specified virtual with a single color in a defined envelope of timing
+| Intended to allow integration of instantaneous game effects over any active virtual
+| Repeated oneshot to a virtual will overwrite the previous oneshot if has not finished
+
+| color: The color to which we wish to fill the virtual, any format supported
+| ramp: The time in ms over which to ramp the color from zero to full weight over the active effect
+| hold: The time in ms to hold the color to full weight over the active effect
+| fade: The time in ms to fade the color from full weight to zero over the active effect
+
+At least one of ramp, hold or fade must be specified
+
+.. code-block:: json
+
+    {
+        "tool":"oneshot",
+        "color":"white",
+        "ramp":10,
+        "hold":200,
+        "fade":2000
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "oneshot"
+    }
+
+The virtual must be active or an error will be returned
+
+.. code-block:: json
+
+    {
+        "status": "failed",
+        "reason": "virtual falcon1 is not active"
     }
 
 /api/effects/<effect_id>/presets
@@ -625,6 +890,7 @@ Where a "virtuals" key is provided, only the virtuals specified will be saved to
         }
 
 |
+
 .. rubric:: DELETE
 
 Delete a scene

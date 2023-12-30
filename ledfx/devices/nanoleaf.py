@@ -1,7 +1,7 @@
 import logging
 import socket
 import struct
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 import requests
 import voluptuous as vol
@@ -36,12 +36,12 @@ class NanoleafDevice(NetworkedDevice):
             vol.Optional(
                 "sync_mode",
                 description="Streaming protocol to Nanoleaf device",
-                default="UDP",
+                default="TCP",
             ): vol.In(["TCP", "UDP"]),
         }
     )
 
-    status: Dict[int, Tuple[int, int, int]]
+    status: dict[int, tuple[int, int, int]]
     _sock: Optional[socket.socket] = None
 
     def __init__(self, ledfx, config):
@@ -197,7 +197,7 @@ class NanoleafDevice(NetworkedDevice):
         ]
 
         config = {
-            "name": nanoleaf_config["name"],
+            "name": self.config["name"],
             "pixel_count": len(panels),
             "pixel_layout": panels,
             "refresh_rate": 30,  # problems with too fast udp packets
@@ -207,6 +207,6 @@ class NanoleafDevice(NetworkedDevice):
         if nanoleaf_config["model"] == LightPanelModel:
             config["udp_port"] = 60221
 
-        self.setup_subdevice()
-
         self.update_config(config)
+
+        self.setup_subdevice()

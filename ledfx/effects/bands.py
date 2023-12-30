@@ -19,11 +19,6 @@ class BandsAudioEffect(AudioReactiveEffect, GradientEffect):
                 description="Alignment of bands",
                 default="left",
             ): vol.In(list(["left", "right", "invert", "center"])),
-            vol.Optional(
-                "mirror",
-                description="Mirror the effect",
-                default=False,
-            ): bool,
         }
     )
 
@@ -61,3 +56,4 @@ class BandsAudioEffect(AudioReactiveEffect, GradientEffect):
                 pass
 
         self.pixels = np.vstack(out_split)
+        self.roll_gradient()

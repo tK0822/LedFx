@@ -13,6 +13,7 @@
 
    configuring
    directing_audio
+   osc
 
 .. toctree::
    :maxdepth: 2
@@ -29,4 +30,4 @@
 License
 -------
 
-LedFx is licensed under the MIT license.
+LedFx is licensed under the GNU GPLv3 license.
