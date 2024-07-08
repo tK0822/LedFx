@@ -27,13 +27,13 @@ class StarTwinkle(TemporalEffect, GradientEffect):
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=100)),
 
             vol.Optional(
-                "color rate",
+                "color_rate",
                 default=2,
                 description="Color change rate",
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=20)),
 
             vol.Optional(
-                "decay rate",
+                "decay_rate",
                 default=100,
                 description="Decay rate of stars",
             ): vol.All(vol.Coerce(int), vol.Range(min=10, max=250)),
@@ -73,9 +73,9 @@ class StarTwinkle(TemporalEffect, GradientEffect):
 
         # Get gradient color
         if self._forward:
-            self._gradient_idx += self._config["color rate"]
+            self._gradient_idx += self._config["color_rate"]
         else:
-            self._gradient_idx -= self._config["color rate"]
+            self._gradient_idx -= self._config["color_rate"]
 
         if self._gradient_idx >= self._gradient_samples:
             self._gradient_idx = self._gradient_samples - 1
@@ -88,6 +88,6 @@ class StarTwinkle(TemporalEffect, GradientEffect):
 
         # Set new twinkles and fade to black
         self.pixels[random_led_idx] = self._color
-        self.pixels = np.array([self._fade_to_black(fade_value=self._config["decay rate"], 
+        self.pixels = np.array([self._fade_to_black(fade_value=self._config["decay_rate"], 
                                                    curr_color=self.pixels[idx]) for idx in self._led_idx])
         

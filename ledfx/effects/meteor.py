@@ -22,19 +22,19 @@ class Meteor(TemporalEffect, GradientEffect):
     CONFIG_SCHEMA = vol.Schema(
         {
             vol.Optional(
-                "meteor length",
+                "meteor_length",
                 default=2,
                 description="Length of meteor",
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=40)),
 
             vol.Optional(
-                "color rate",
+                "color_rate",
                 default=2,
                 description="Color change rate",
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=20)),
 
             vol.Optional(
-                "decay rate",
+                "decay_rate",
                 default=100,
                 description="Decay rate of stars",
             ): vol.All(vol.Coerce(int), vol.Range(min=10, max=250)),
@@ -75,15 +75,15 @@ class Meteor(TemporalEffect, GradientEffect):
             self._idx = 0
 
         # Fade meteor randomly
-        self.pixels = np.array([self._fade_to_black(fade_value=self._config["decay rate"], curr_color=self.pixels[idx]) 
+        self.pixels = np.array([self._fade_to_black(fade_value=self._config["decay_rate"], curr_color=self.pixels[idx]) 
                             if (rand.randint(0, 10) > 5)
                             else self.pixels[idx] for idx in self._led_idx])
 
         # Get gradient color
         if self._forward:
-            self._gradient_idx += self._config["color rate"]
+            self._gradient_idx += self._config["color_rate"]
         else:
-            self._gradient_idx -= self._config["color rate"]
+            self._gradient_idx -= self._config["color_rate"]
 
         if self._gradient_idx >= self._gradient_samples:
             self._gradient_idx = self._gradient_samples - 1
@@ -95,7 +95,7 @@ class Meteor(TemporalEffect, GradientEffect):
         self._color = self._gradient_curve[:, self._gradient_idx]
         
         # Draw Meteor
-        for k in np.arange(0, self._config["meteor length"]):
+        for k in np.arange(0, self._config["meteor_length"]):
             if (self._idx - k < self.pixel_count) & (self._idx - k >= 0):
                 self.pixels[self._idx - k] = self._color
 

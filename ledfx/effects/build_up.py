@@ -22,7 +22,7 @@ class BuildUp(TemporalEffect, GradientEffect):
     CONFIG_SCHEMA = vol.Schema(
         {
             vol.Optional(
-                "color rate",
+                "color_rate",
                 default=2,
                 description="Color change rate",
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=200)),
@@ -54,9 +54,9 @@ class BuildUp(TemporalEffect, GradientEffect):
 
         # Get gradient color
         if self._gradient_forward:
-            self._gradient_idx += self._config["color rate"]
+            self._gradient_idx += self._config["color_rate"]
         else:
-            self._gradient_idx -= self._config["color rate"]
+            self._gradient_idx -= self._config["color_rate"]
 
         if self._gradient_idx >= self._gradient_samples:
             self._gradient_idx = self._gradient_samples - 1
