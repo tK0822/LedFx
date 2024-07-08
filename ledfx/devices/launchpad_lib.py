@@ -17,6 +17,7 @@ import time
 import timeit
 
 import rtmidi
+from rtmidi import SystemError as RtmidiSystemError
 from rtmidi.midiutil import open_midiinput, open_midioutput
 
 _LOGGER = logging.getLogger(__name__)
@@ -101,7 +102,8 @@ class RtmidiWrap:
                 self.devOut, self.nameOut = open_midioutput(
                     midi_id, interactive=False
                 )
-            except Exception:
+            except Exception as e:
+                _LOGGER.warning(f"{e}")
                 self.devOut = None
                 self.nameOut = None
                 return False
@@ -194,6 +196,7 @@ class LaunchpadBase:
         self.frame = 0
         self.fps = 0
         self.do_once = True
+        self.supported = False
 
     def flush(self, data, alpha, diag):
         if self.do_once:
@@ -201,6 +204,7 @@ class LaunchpadBase:
                 f"flush not implemented for {self.__class__.__name__}"
             )
             self.do_once = False
+        return False
 
     def __del__(self):
         self.Close()
@@ -719,6 +723,10 @@ class LaunchpadMk2(LaunchpadPro):
         ),
     ]
 
+    def __init__(self):
+        super().__init__()
+        self.supported = True
+
     # Overrides "LaunchpadPro" method
     def Open(self, number=0, name="Mk2"):
         return super().Open(number=number, name=name)
@@ -809,8 +817,13 @@ class LaunchpadMk2(LaunchpadPro):
                 pgm_mode_pos += 1
             self.midi.RawWriteSysEx(send_buffer)
 
-        except RuntimeError:
-            _LOGGER.error("Error in Launchpad Mk2 handling")
+        except RuntimeError as e:
+            _LOGGER.warning(f"Flush ({type(e).__name__}): {e}")
+            return False
+
+        except RtmidiSystemError as e:
+            _LOGGER.warning(f"Flush ({type(e).__name__}): {e}")
+            return False
 
         if diag:
             now = timeit.default_timer()
@@ -823,6 +836,8 @@ class LaunchpadMk2(LaunchpadPro):
                 self.frame += 1
             _LOGGER.info(f"Launchpad Mk2 flush {self.fps} : {now - start}")
             self.lasttime = nowint
+
+        return True
 
 
 # ==========================================================================
@@ -1254,125 +1269,6 @@ class Dicer(LaunchpadBase):
 
 
 # ==========================================================================
-# CLASS LaunchpadMiniMk3
-#
-# For 3-color "Mk3" Launchpads; Mini and Pro
-# ==========================================================================
-class LaunchpadMiniMk3(LaunchpadPro):
-    # LED AND BUTTON NUMBERS IN RAW MODE (DEC)
-    #
-    #
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |104|   |106|   |   |   |   |111|  |112|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 81|   |   |   |   |   |   |   |  | 89|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 71|   |   |   |   |   |   |   |  | 79|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 61|   |   |   |   |   | 67|   |  | 69|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 51|   |   |   |   |   |   |   |  | 59|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 41|   |   |   |   |   |   |   |  | 49|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 31|   |   |   |   |   |   |   |  | 39|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 21|   | 23|   |   |   |   |   |  | 29|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        | 11|   |   |   |   |   |   |   |  | 19|
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #
-    #
-    #
-    # LED AND BUTTON NUMBERS IN XY MODE (X/Y)
-    #
-    #          0   1   2   3   4   5   6   7      8
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |0/0|   |2/0|   |   |   |   |   |  |8/0|  0
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |0/1|   |   |   |   |   |   |   |  |   |  1
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |   |   |   |   |  |   |  2
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |   |5/3|   |   |  |   |  3
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |   |   |   |   |  |   |  4
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |   |   |   |   |  |   |  5
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |4/6|   |   |   |  |   |  6
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |   |   |   |   |  |   |  7
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #        |   |   |   |   |   |   |   |   |  |8/8|  8
-    #        +---+---+---+---+---+---+---+---+  +---+
-    #
-
-    # 	COLORS = {'black':0, 'off':0, 'white':3, 'red':5, 'green':17 }
-
-    # -------------------------------------------------------------------------------------
-    # -- Opens one of the attached Launchpad MIDI devices.
-    # -- Uses search string "MiniMk3", by default.
-    # -------------------------------------------------------------------------------------
-    # Overrides "LaunchpadPro" method
-    def Open(self, number=0, name="MiniMK3"):
-        retval = super().Open(number=number, name=name)
-        if retval is True:
-            self.LedSetMode(1)
-
-        return retval
-
-    # -------------------------------------------------------------------------------------
-    # -- Checks if a device exists, but does not open it.
-    # -- Does not check whether a device is in use or other, strange things...
-    # -- Uses search string "MiniMk3", by default.
-    # -------------------------------------------------------------------------------------
-    # Overrides "LaunchpadBase" method
-    def Check(self, number=0, name="MiniMK3"):
-        return super().Check(number=number, name=name)
-
-    # -------------------------------------------------------------------------------------
-    # -- Sets the button layout (and codes) to the set, specified by <mode>.
-    # -- Valid options:
-    # --  00 - Session, 04 - Drums, 05 - Keys, 06 - User (Drum)
-    # --  0D - DAW Faders (available if Session enabled), 7F - Programmer
-    # -- Until now, we'll need the "Session" (0x00) settings.
-    # -------------------------------------------------------------------------------------
-    # TODO: ASkr, Undocumented!
-    # TODO: return value
-    def LedSetLayout(self, mode):
-        ValidModes = [0x00, 0x04, 0x05, 0x06, 0x0D, 0x7F]
-        if mode not in ValidModes:
-            return
-
-        self.midi.RawWriteSysEx([0, 32, 41, 2, 13, 0, mode])
-        time.sleep(0.010)
-
-    # -------------------------------------------------------------------------------------
-    # -- Selects the Mk3's mode.
-    # -- <mode> -> 0 -> "Ableton Live mode"
-    # --           1 -> "Programmer mode"	(what we need)
-    # -------------------------------------------------------------------------------------
-    def LedSetMode(self, mode):
-        if mode < 0 or mode > 1:
-            return
-
-        self.midi.RawWriteSysEx([0, 32, 41, 2, 13, 14, mode])
-        time.sleep(0.010)
-
-    # -------------------------------------------------------------------------------------
-    # -- Sets the button layout to "Session" mode.
-    # -------------------------------------------------------------------------------------
-    # TODO: ASkr, Undocumented!
-    def LedSetButtonLayoutSession(self):
-        self.LedSetLayout(0)
-
-
-# ==========================================================================
 # CLASS LaunchpadLPX
 #
 # For 3-color "X" Launchpads
@@ -1441,6 +1337,12 @@ class LaunchpadLPX(LaunchpadPro):
         ),
     ]
 
+    device_id = 12
+
+    def __init__(self):
+        super().__init__()
+        self.supported = True
+
     # -------------------------------------------------------------------------------------
     # Overrides "LaunchpadPro" method
     def Open(self, number=0, name="AUTO"):
@@ -1487,7 +1389,8 @@ class LaunchpadLPX(LaunchpadPro):
         if mode not in ValidModes:
             return
 
-        self.midi.RawWriteSysEx([0, 32, 41, 2, 12, 0, mode])
+        self.midi.RawWriteSysEx([0, 32, 41, 2, self.device_id, 0, mode])
+
         time.sleep(0.010)
 
     # -------------------------------------------------------------------------------------
@@ -1499,7 +1402,7 @@ class LaunchpadLPX(LaunchpadPro):
         if mode < 0 or mode > 1:
             return
 
-        self.midi.RawWriteSysEx([0, 32, 41, 2, 12, 14, mode])
+        self.midi.RawWriteSysEx([0, 32, 41, 2, self.device_id, 14, mode])
         time.sleep(0.010)
 
     # -------------------------------------------------------------------------------------
@@ -1635,7 +1538,7 @@ class LaunchpadLPX(LaunchpadPro):
             # send_buffer.extend([3, 35, 127, 0, 0])
 
             # stuff the send buffer with the command preamble
-            send_buffer = [0, 32, 41, 2, 12, 3]
+            send_buffer = [0, 32, 41, 2, self.device_id, 3]
 
             # prebump the programmer mode index up a row and just before
             pgm_mode_pos = 10
@@ -1655,8 +1558,13 @@ class LaunchpadLPX(LaunchpadPro):
                 pgm_mode_pos += 1
             self.midi.RawWriteSysEx(send_buffer)
 
-        except RuntimeError:
-            _LOGGER.error("Error in LaunchpadLPX handling")
+        except RuntimeError as e:
+            _LOGGER.warning(f"Flush ({type(e).__name__}): {e}")
+            return False
+
+        except RtmidiSystemError as e:
+            _LOGGER.warning(f"Flush ({type(e).__name__}): {e}")
+            return False
 
         if diag:
             now = timeit.default_timer()
@@ -1669,6 +1577,38 @@ class LaunchpadLPX(LaunchpadPro):
                 self.frame += 1
             _LOGGER.info(f"Launchpad X flush {self.fps} : {now - start}")
             self.lasttime = nowint
+
+        return True
+
+
+# ==========================================================================
+# CLASS LaunchpadMiniMk3
+#
+# For 3-color "Mk3" Launchpads; Mini and Pro
+# ==========================================================================
+class LaunchpadMiniMk3(LaunchpadLPX):
+    device_id = 13
+
+    # -------------------------------------------------------------------------------------
+    # -- Opens one of the attached Launchpad MIDI devices.
+    # -- Uses search string "MiniMk3", by default.
+    # -------------------------------------------------------------------------------------
+    # Overrides "LaunchpadPro" method
+    def Open(self, number=0, name="MiniMK3"):
+        retval = super().Open(number=number, name=name)
+        if retval is True:
+            self.LedSetMode(1)
+
+        return retval
+
+    # -------------------------------------------------------------------------------------
+    # -- Checks if a device exists, but does not open it.
+    # -- Does not check whether a device is in use or other, strange things...
+    # -- Uses search string "MiniMk3", by default.
+    # -------------------------------------------------------------------------------------
+    # Overrides "LaunchpadBase" method
+    def Check(self, number=0, name="MiniMK3"):
+        return super().Check(number=number, name=name)
 
 
 # ==========================================================================
@@ -2099,6 +2039,10 @@ class LaunchpadS(LaunchpadPro):
 
     buffer0 = True
 
+    def __init__(self):
+        super().__init__()
+        self.supported = True
+
     def Open(self, number=0, name="Launchpad S"):
         retval = super().Open(number=number, name=name)
         if retval is True:
@@ -2160,30 +2104,39 @@ class LaunchpadS(LaunchpadPro):
 
         send_status = True
 
-        for index, map in enumerate(self.pixel_map2):
-            if (index % 2) == 0:
-                out1 = self.scolmap(data[map][0], data[map][1])
-            else:
-                out2 = self.scolmap(data[map][0], data[map][1])
-
-                if alpha:
-                    if send_status:
-                        self.midi.RawWrite(0x92, out1, out2)
-                        send_status = False
-                    else:
-                        self.midi.RawWriteTwo(out1, out2)
+        try:
+            for index, map in enumerate(self.pixel_map2):
+                if (index % 2) == 0:
+                    out1 = self.scolmap(data[map][0], data[map][1])
                 else:
-                    self.midi.RawWrite(0x92, out1, out2)
+                    out2 = self.scolmap(data[map][0], data[map][1])
 
-        if self.buffer0:
-            # Display buffer 0, and write to buffer 1
-            self.midi.RawWrite(0xB0, 0x00, 0x24)
-        else:
-            # Display buffer 1, and write to buffer 0
-            self.midi.RawWrite(0xB0, 0x00, 0x21)
+                    if alpha:
+                        if send_status:
+                            self.midi.RawWrite(0x92, out1, out2)
+                            send_status = False
+                        else:
+                            self.midi.RawWriteTwo(out1, out2)
+                    else:
+                        self.midi.RawWrite(0x92, out1, out2)
 
-        # and flip buffers
-        self.buffer0 = not self.buffer0
+            if self.buffer0:
+                # Display buffer 0, and write to buffer 1
+                self.midi.RawWrite(0xB0, 0x00, 0x24)
+            else:
+                # Display buffer 1, and write to buffer 0
+                self.midi.RawWrite(0xB0, 0x00, 0x21)
+
+            # and flip buffers
+            self.buffer0 = not self.buffer0
+
+        except RuntimeError as e:
+            _LOGGER.warning(f"Flush ({type(e).__name__}): {e}")
+            return False
+
+        except RtmidiSystemError as e:
+            _LOGGER.warning(f"Flush ({type(e).__name__}): {e}")
+            return False
 
         if diag:
             now = timeit.default_timer()
@@ -2196,3 +2149,5 @@ class LaunchpadS(LaunchpadPro):
                 self.frame += 1
             _LOGGER.info(f"Launchpad S flush {self.fps} : {now - start}")
             self.lasttime = nowint
+
+        return True

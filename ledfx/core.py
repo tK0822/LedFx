@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import sys
 import time
 import warnings
@@ -17,7 +18,16 @@ from ledfx.color import (
     validate_color,
     validate_gradient,
 )
-from ledfx.config import Transmission, get_ssl_certs, load_config, save_config
+from ledfx.config import (
+    VISUALISATION_CONFIG_KEYS,
+    Transmission,
+    create_backup,
+    get_ssl_certs,
+    load_config,
+    remove_virtuals_active_effects,
+    save_config,
+)
+from ledfx.consts import PROJECT_VERSION
 from ledfx.devices import Devices
 from ledfx.effects import Effects
 from ledfx.effects.math import interpolate_pixels
@@ -29,10 +39,12 @@ from ledfx.events import (
 )
 from ledfx.http_manager import HttpServer
 from ledfx.integrations import Integrations
+from ledfx.mdns_manager import ZeroConfRunner
 from ledfx.presets import ledfx_presets
 from ledfx.scenes import Scenes
 from ledfx.utils import (
     RollingQueueHandler,
+    UpdateChecker,
     UserDefaultCollection,
     async_fire_and_forget,
     currently_frozen,
@@ -40,11 +52,21 @@ from ledfx.utils import (
 from ledfx.virtuals import Virtuals
 
 _LOGGER = logging.getLogger(__name__)
+
 if currently_frozen():
     warnings.filterwarnings("ignore")
 
 
 class LedFxCore:
+
+    EXIT_CODES = {
+        1: "LedFx encountered an error - Shutting down.",
+        2: "Keyboard interrupt - Shutting down.",
+        3: "Shutdown request via API - Shutting down.",
+        4: "Restart request via API - Restarting.",
+        5: "Shutdown request via CI testing flag - Shutting down.",
+    }
+
     def __init__(
         self,
         config_dir,
@@ -53,16 +75,30 @@ class LedFxCore:
         port_s=None,
         icon=None,
         ci_testing=False,
+        clear_config=False,
+        clear_effects=False,
+        offline_mode=False,
     ):
+
         self.icon = icon
         self.config_dir = config_dir
+
+        if clear_config:
+            _LOGGER.warning("Clearing LedFx config.")
+            create_backup(config_dir, "DELETE")
+
         self.config = load_config(config_dir)
+
+        if clear_effects:
+            _LOGGER.warning("Clearing active effects.")
+            remove_virtuals_active_effects(self.config)
+
         self.config["ledfx_presets"] = ledfx_presets
         self.host = host if host else self.config["host"]
         self.port = port if port else self.config["port"]
         self.port_s = port_s if port_s else self.config["port_s"]
         self.ci_testing = ci_testing
-
+        self.offline_mode = offline_mode
         if sys.platform == "win32":
             self.loop = asyncio.ProactorEventLoop()
         else:
@@ -88,10 +124,30 @@ class LedFxCore:
         self.setup_logqueue()
         self.events = Events(self)
         self.setup_visualisation_events()
+        self.events.add_listener(
+            self.handle_base_configuration_update, Event.BASE_CONFIG_UPDATE
+        )
         self.http = HttpServer(
             ledfx=self, host=self.host, port=self.port, port_s=self.port_s
         )
+
         self.exit_code = None
+
+    def handle_base_configuration_update(self, event):
+        """
+        Handles the update of the base configuration where there are specific things that need to be done.
+
+        Currently, only visualisation configuration is handled this way, since they require the creation of new event listeners.
+
+        Args:
+            event (Event): The event that triggered the update - this will always be a BaseConfigUpdateEvent.
+        """
+        _LOGGER.debug("Handling base configuration update.")
+        if any(key in event.config for key in VISUALISATION_CONFIG_KEYS):
+            _LOGGER.debug(
+                "Visualisation configuration updated - resetting visualisation event listeners."
+            )
+            self.setup_visualisation_events()
 
     def dev_enabled(self):
         return self.config["dev_mode"]
@@ -122,14 +178,21 @@ class LedFxCore:
             webbrowser.get().open(url)
         except webbrowser.Error:
             _LOGGER.warning(
-                f"Failed to open default web browser. To access LedFx's web ui, open {url} in your browser. To prevent this error in future, configure a default browser for your system."
+                f"Failed to open default web browser. To access LedFx's web ui, open {url} in your browser."
             )
 
     def setup_icon_menu(self):
         import pystray
 
         self.icon.menu = pystray.Menu(
+            pystray.MenuItem(
+                f"LedFx - {PROJECT_VERSION}", None, enabled=False
+            ),
+            pystray.Menu.SEPARATOR,
             pystray.MenuItem("Open", self.open_ui, default=True),
+            pystray.MenuItem(
+                "Check for Update", self.check_and_notify_updates
+            ),
             pystray.MenuItem("Quit Ledfx", self.stop),
         )
 
@@ -138,6 +201,15 @@ class LedFxCore:
         creates event listeners to fire visualisation events at
         a given rate
         """
+        # Remove existing listeners if they exist
+        if hasattr(self, "visualisation_update_listener"):
+            _LOGGER.debug(
+                "Removing existing visualisation event handler and event listeners."
+            )
+            self.visualisation_update_listener = None
+            self.virtual_listener()
+            self.device_listener()
+
         min_time_since = 1 / self.config["visualisation_fps"]
         time_since_last = {}
         max_len = self.config["visualisation_maxlen"]
@@ -178,13 +250,16 @@ class LedFxCore:
                 VisualisationUpdateEvent(is_device, vis_id, pixels)
             )
 
-        self.events.add_listener(
-            handle_visualisation_update,
+        _LOGGER.debug("Setting up visualisation event handler.")
+        self.visualisation_update_listener = handle_visualisation_update
+        _LOGGER.debug("Adding virtual update event listener.")
+        self.virtual_listener = self.events.add_listener(
+            self.visualisation_update_listener,
             Event.VIRTUAL_UPDATE,
         )
-
-        self.events.add_listener(
-            handle_visualisation_update,
+        _LOGGER.debug("Adding device update event listener.")
+        self.device_listener = self.events.add_listener(
+            self.visualisation_update_listener,
             Event.DEVICE_UPDATE,
         )
 
@@ -198,8 +273,55 @@ class LedFxCore:
         root_logger = logging.getLogger()
         root_logger.addHandler(logqueue_handler)
 
-    async def flush_loop(self):
-        await asyncio.sleep(0)
+    def check_and_notify_updates(self, show_check_notification=None):
+        """
+        Checks for updates of LedFx and notifies the user if a new version is available.
+
+        Args:
+            show_check_notification (object): An optional parameter that is never called with any specific value.
+                When called via pystray, it is an icon object. This behavior is unintended but functional.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
+
+        if show_check_notification:
+            if self.icon and self.icon.HAS_NOTIFICATION:
+                self.icon.notify("Checking for updates...", "LedFx")
+        is_release = os.getenv("IS_RELEASE", "false").lower()
+        if is_release == "false":
+            _LOGGER.info("Not checking for updates - not a release.")
+            return
+        _LOGGER.info("Checking for updates...")
+        if UpdateChecker.get_release_information():
+            if UpdateChecker.update_available():
+                latest_version = UpdateChecker.get_latest_version()
+                release_url = UpdateChecker.get_release_url()
+                _LOGGER.warning(
+                    f"New version of LedFx available: {latest_version} - {release_url}"
+                )
+
+                if self.icon and self.icon.HAS_NOTIFICATION:
+                    self.icon.notify(
+                        f"New version of LedFx available: {latest_version}",
+                        "LedFx",
+                    )
+                    try:
+                        webbrowser.get().open(release_url)
+                    except webbrowser.Error:
+                        pass
+            else:
+                _LOGGER.info("LedFx is up to date.")
+        else:
+            _LOGGER.warning("Unable to get update information.")
+            if show_check_notification:
+                if self.icon and self.icon.HAS_NOTIFICATION:
+                    self.icon.notify(
+                        "Unable to get update information", "LedFx"
+                    )
 
     def start(self, open_ui=False):
         async_fire_and_forget(self.async_start(open_ui=open_ui), self.loop)
@@ -208,7 +330,7 @@ class LedFxCore:
             self.loop.run_forever()
         except KeyboardInterrupt:
             self.loop.call_soon(
-                self.loop.create_task, self.async_stop(exit_code=1)
+                self.loop.create_task, self.async_stop(exit_code=2)
             )
             self.loop.run_forever()
         except BaseException:
@@ -223,7 +345,8 @@ class LedFxCore:
         return self.exit_code
 
     async def async_start(self, open_ui=False):
-        _LOGGER.info("Starting LedFx")
+        _LOGGER.info(f"Starting LedFx, listening on {self.host}:{self.port}")
+
         await self.http.start(get_ssl_certs(config_dir=self.config_dir))
         if (
             self.icon is not None
@@ -259,17 +382,14 @@ class LedFxCore:
         self.devices.create_from_config(self.config["devices"])
         await self.devices.async_initialize_devices()
 
-        # sync_mode = WLED_CONFIG_SCHEMA(self.config["wled_preferences"])[
-        #     "wled_preferred_mode"
-        # ]
-        # if sync_mode:
-        #     await self.devices.set_wleds_sync_mode(sync_mode)
-
+        self.zeroconf = ZeroConfRunner(ledfx=self)
         self.virtuals.create_from_config(self.config["virtuals"])
         self.integrations.create_from_config(self.config["integrations"])
 
         if self.config["scan_on_startup"]:
-            async_fire_and_forget(self.devices.find_wled_devices(), self.loop)
+            async_fire_and_forget(
+                self.zeroconf.discover_wled_devices(), self.loop
+            )
 
         async_fire_and_forget(
             self.integrations.activate_integrations(), self.loop
@@ -281,7 +401,9 @@ class LedFxCore:
         if self.ci_testing:
             await asyncio.sleep(5)
             self.stop(5)
-        await self.flush_loop()
+
+        if not self.offline_mode:
+            self.check_and_notify_updates()
 
     def stop(self, exit_code):
         async_fire_and_forget(self.async_stop(exit_code), self.loop)
@@ -291,44 +413,43 @@ class LedFxCore:
             return
 
         print("Stopping LedFx.")
+        try:
+            _LOGGER.info(self.EXIT_CODES.get(exit_code, "Unknown exit code."))
+            # Fire a shutdown event
+            self.events.fire_event(LedFxShutdownEvent())
+            _LOGGER.info("Stopping HTTP Server...")
+            await self.http.stop()
 
-        # 1 = Error
-        # 2 = Direct User Input
-        # 3 = API Request (shutdown)
-        # 4 = Restart (stop then restart ledfx core)
+            # Cancel all the remaining task and wait
+            tasks = [
+                task
+                for task in asyncio.all_tasks()
+                if task is not asyncio.current_task()
+            ]
+            if tasks:
+                _LOGGER.debug(
+                    f"Killing {len(tasks)} tasks prior to shutdown..."
+                )
+                # Cancel all tasks concurrently
+                group = asyncio.gather(*tasks, return_exceptions=True)
+                group.cancel()
+                # Wait for all tasks to be cancelled
+                try:
+                    await group
+                except asyncio.CancelledError:
+                    pass
+                _LOGGER.debug("All tasks killed.")
+            # Save the configuration before shutting down
+            save_config(config=self.config, config_dir=self.config_dir)
 
-        if exit_code == 1:
-            _LOGGER.info("LedFx encountered an error. Shutting Down.")
-        if exit_code == 2:
-            _LOGGER.info("LedFx Keyboard Interrupt. Shutting Down.")
-        if exit_code == 3:
-            _LOGGER.info("LedFx Shutdown Request via API. Shutting Down.")
-        if exit_code == 4:
-            _LOGGER.info("LedFx is restarting.")
-        if exit_code == 5:
-            _LOGGER.info("LedFx Shutdown via CI Testing Flag.")
-        # Fire a shutdown event and flush the loop
-        self.events.fire_event(LedFxShutdownEvent())
-        await asyncio.sleep(0)
+        except Exception as e:
+            _LOGGER.error(f"An error occurred while stopping: {e}")
+            self.exit_code = 1
 
-        _LOGGER.info("Stopping HttpServer...")
-        await self.http.stop()
-
-        # Cancel all the remaining task and wait
-        _LOGGER.info("Killing remaining tasks...")
-        tasks = [
-            task
-            for task in asyncio.all_tasks()
-            if task is not asyncio.current_task()
-        ]
-        list(map(lambda task: task.cancel(), tasks))
-
-        # Save the configuration before shutting down
-        save_config(config=self.config, config_dir=self.config_dir)
-
-        _LOGGER.info("Flushing loop...")
-        await self.flush_loop()
-        self.thread_executor.shutdown()
-        self.exit_code = exit_code
-        self.loop.stop()
-        return exit_code
+        finally:
+            self.thread_executor.shutdown()
+            # Don't overwrite error exit code
+            if self.exit_code != 1:
+                self.exit_code = exit_code
+            self.loop.stop()
+            return exit_code

@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+import voluptuous as vol
 
 from ledfx.effects import Effect
 from ledfx.effects.gradient import GradientEffect
@@ -26,47 +27,18 @@ plt.plot(_triangle)
 """
 
 
-def hsv_to_rgb(hsv):
-    """
-    Convert pixel array of type np.array([[h,s,v], ...])
-                             to np.array([[r,g,b], ...])
-
-    algorithm from https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
-    """
-    h, s, v = hsv[:, 0], hsv[:, 1], hsv[:, 2]
-    c = v * s
-    h *= 6
-    x = c * (1 - np.abs(h % 2 - 1))
-    rgb = np.zeros(hsv.shape)
-    mask = (0 <= h) & (h <= 1)
-    rgb[mask, 0] = c[mask]
-    rgb[mask, 1] = x[mask]
-    mask = (1 < h) & (h <= 2)
-    rgb[mask, 0] = x[mask]
-    rgb[mask, 1] = c[mask]
-    mask = (2 < h) & (h <= 3)
-    rgb[mask, 1] = c[mask]
-    rgb[mask, 2] = x[mask]
-    mask = (3 < h) & (h <= 4)
-    rgb[mask, 1] = x[mask]
-    rgb[mask, 2] = c[mask]
-    mask = (4 < h) & (h <= 5)
-    rgb[mask, 0] = x[mask]
-    rgb[mask, 2] = c[mask]
-    mask = (5 < h) & (h <= 6)
-    rgb[mask, 0] = c[mask]
-    rgb[mask, 2] = x[mask]
-    m = v - c
-
-    rgb[:, 0] += m
-    rgb[:, 1] += m
-    rgb[:, 2] += m
-
-    return rgb * 255
-
-
 @Effect.no_registration
 class HSVEffect(GradientEffect):
+    CONFIG_SCHEMA = vol.Schema(
+        {
+            vol.Optional(
+                "fix_hues",
+                description="Use perceptually even hue distribution",
+                default=True,
+            ): bool
+        }
+    )
+
     _start_time = time.time_ns()
     # 65.536 s expressed in ns
     _conversion_factor = 65.536 * 1e9
@@ -88,12 +60,14 @@ class HSVEffect(GradientEffect):
     def render(self):
         # update the timestep, converting ns to s
         self._dt = time.time_ns() - self._start_time
-        self._assert_gradient()
         self.render_hsv()
 
         hsv = np.copy(self.hsv_array)
+        if self._config["fix_hues"]:
+            h = self.fix_hue_fast(hsv[:, 0])
+        else:
+            h = hsv[:, 0]
 
-        h = hsv[:, 0]
         s = hsv[:, 1].reshape(-1, 1)
         v = hsv[:, 2].reshape(-1, 1)
         pixels = self.pixels
@@ -103,12 +77,13 @@ class HSVEffect(GradientEffect):
         h *= self.pixel_count - 1
         h = h.astype(int)
         # Grab the colors from the gradient
-        self._assert_gradient()
-        pixels[:] = self._gradient_curve[:, h].T
+        pixels[:] = self.get_gradient()[:, h].T
         # Apply saturation to colors
         pixels += (np.max(pixels, axis=1).reshape(-1, 1) - pixels) * (1 - s)
         # Apply value (brightness) to colors
         pixels *= v
+
+        self.roll_gradient()
 
     def render_hsv(self):
         """
@@ -182,9 +157,8 @@ class HSVEffect(GradientEffect):
     # Perceptual hue utility - for better rainbows
 
     # The HSV model's hue parameter isn't linear to human perception of equidistant color.
-    # fix_hue() and fix_hue_fast() stretch reds and compresses greens and blues to produce a more even rainbow.
-    # fix_hue() makes better rainbows and is customizable, but fix_hue_fast() is faster
-
+    # fix_hue_fast() stretch reds and compresses greens and blues to produce a more even rainbow.
+    # There is an old fix_hue that is more accurate but slower and produced more blocky transitions.
     # See a more complete discussion and intense approaches at:
     # https://stackoverflow.com/questions/5162458/fade-through-more-more-natural-rainbow-spectrum-in-hsv-hsb
 
@@ -194,28 +168,10 @@ class HSVEffect(GradientEffect):
         Takes a "perceptual hue" (pH) that aspires to progress evenly across a human-perceived rainbow
         This simpler approach is 40% faster than fixH() but to my eyes, bright greens feel over-represented
         and deep blues are under-represented
+        We will let the user decide if they want to use it via an option for HSV effects.
         """
         np.mod(hue, 1, out=hue)
         np.subtract(hue, 0.5, out=hue)
         np.divide(hue, 2, out=hue)
         self.array_sin(hue)
-
-    def _roll_hsv(self):
-        if self._config["gradient_roll"] == 0:
-            return
-
-        self._hsv_roll_counter += self._config["gradient_roll"]
-
-        if self._hsv_roll_counter >= 1.0:
-            pixels_to_roll = np.floor(self._hsv_roll_counter)
-            self._hsv_roll_counter -= pixels_to_roll
-
-            if "invert_roll" in self._config:
-                if self._config["invert_roll"]:
-                    pixels_to_roll *= -1
-
-            self.hsv = np.roll(
-                self.hsv,
-                int(pixels_to_roll),
-                axis=0,
-            )
+        return hue

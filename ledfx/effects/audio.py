@@ -1,5 +1,6 @@
 import logging
 import queue
+import threading
 import time
 from collections import deque
 from functools import cached_property, lru_cache
@@ -33,6 +34,7 @@ class AudioInputSource:
     _volume = -90
     _volume_filter = ExpFilter(-90, alpha_decay=0.99, alpha_rise=0.99)
     _subscriber_threshold = 0
+    _timer = None
 
     @staticmethod
     def device_index_validator(val):
@@ -52,6 +54,13 @@ class AudioInputSource:
         return tuple(AudioInputSource.input_devices().keys())
 
     @staticmethod
+    def audio_input_device_exists():
+        """
+        Returns True if there are valid input devices
+        """
+        return len(AudioInputSource.valid_device_indexes()) > 0
+
+    @staticmethod
     def default_device_index():
         """
         Finds the WASAPI loopback device index of the default output device if it exists
@@ -61,17 +70,45 @@ class AudioInputSource:
         """
         device_list = sd.query_devices()
         default_output_device = sd.default.device["output"]
-        # target device should be the name of the default_output device plus " [Loopback]"
-        target_device = (
-            f"{device_list[default_output_device]['name']} [Loopback]"
-        )
-        # We need to run over the device list looking for the target device
-        for device_index, device in enumerate(device_list):
-            if device["name"] == target_device:
-                # Return the loopback device index
-                return device_index
-        # No Loopback device matching output found - return the default input device index
-        return sd.default.device["input"]
+        if len(device_list) == 0 or default_output_device == -1:
+            _LOGGER.warn("No audio output devices found.")
+        else:
+            # target device should be the name of the default_output device plus " [Loopback]"
+            target_device = (
+                f"{device_list[default_output_device]['name']} [Loopback]"
+            )
+            # We need to run over the device list looking for the target device
+            # NOTE: Some sound drivers truncate the device name, so we may not find a match
+            for device_index, device in enumerate(device_list):
+                if device["name"] == target_device:
+                    # Return the loopback device index
+                    _LOGGER.debug(
+                        f"Default audio loopback device found: {device['name']}"
+                    )
+                    return device_index
+            # If we don't match a Loopback device matching output found - return the default input device index
+            default_input_device_idx = sd.default.device["input"]
+
+        # The default input device index is not always valid (i.e no default input devices)
+        valid_device_indexes = AudioInputSource.valid_device_indexes()
+        if len(valid_device_indexes) == 0:
+            _LOGGER.warning(
+                "No valid audio input devices found. Unable to use audio reactive effects."
+            )
+            return None
+        else:
+            if default_input_device_idx in valid_device_indexes:
+                _LOGGER.debug(
+                    "No default audio loopback device found. Using default input device."
+                )
+                return default_input_device_idx
+            else:
+                # Return the first valid input device index if we can't find a valid default input device
+                if len(valid_device_indexes) > 0:
+                    _LOGGER.debug(
+                        "No valid default audio input device found. Using first valid input device."
+                    )
+                    return next(iter(valid_device_indexes))
 
     @staticmethod
     def query_hostapis():
@@ -108,14 +145,15 @@ class AudioInputSource:
         default_device_index = AudioInputSource.default_device_index()
         valid_device_indexes = AudioInputSource.valid_device_indexes()
         input_devices = AudioInputSource.input_devices()
-
+        melbanks = Melbanks.CONFIG_SCHEMA
+        audio_analysis = AudioAnalysisSource.CONFIG_SCHEMA
         return vol.Schema(
             {
                 vol.Optional("sample_rate", default=60): int,
                 vol.Optional("mic_rate", default=44100): int,
                 vol.Optional("fft_size", default=FFT_SIZE): int,
                 vol.Optional("min_volume", default=0.2): vol.All(
-                    vol.Coerce(float), vol.Range(min=0.0, max=10.0)
+                    vol.Coerce(float), vol.Range(min=0.0, max=1.0)
                 ),
                 vol.Optional(
                     "audio_device", default=default_device_index
@@ -131,12 +169,17 @@ class AudioInputSource:
 
     def __init__(self, ledfx, config):
         self._ledfx = ledfx
+        self.lock = threading.Lock()
         self.update_config(config)
 
-        def deactivate(e):
-            self.deactivate()
+        def shutdown_event(e):
+            # We give the rest of LedFx a second to shutdown before we deactivate the audio subsystem.
+            # This is to prevent LedFx hanging on shutdown if the audio subsystem is still running while
+            # effects are being unloaded. This is a bit hacky but it works.
+            self._timer = threading.Timer(0.5, self.check_and_deactivate)
+            self._timer.start()
 
-        self._ledfx.events.add_listener(deactivate, Event.LEDFX_SHUTDOWN)
+        self._ledfx.events.add_listener(shutdown_event, Event.LEDFX_SHUTDOWN)
 
     def update_config(self, config):
         """Deactivate the audio, update the config, the reactivate"""
@@ -158,6 +201,7 @@ class AudioInputSource:
                     self.input_devices()[self._config["audio_device"]]
                 )
             )
+        self._ledfx.config["audio"] = self._config
 
     def activate(self):
         if self._audio is None:
@@ -172,6 +216,15 @@ class AudioInputSource:
         input_devices = self.query_devices()
         hostapis = self.query_hostapis()
         default_device = self.default_device_index()
+        if default_device is None:
+            # There are no valid audio input devices, so we can't activate the audio source.
+            # We should never get here, as we check for devices on start-up.
+            # This likely just captures if a device is removed after start-up.
+            _LOGGER.warning(
+                "Audio input device not found. Unable to activate audio source. Deactivating."
+            )
+            self.deactivate()
+            return
         valid_device_indexes = self.valid_device_indexes()
         device_idx = self._config["audio_device"]
 
@@ -187,50 +240,26 @@ class AudioInputSource:
             )
             device_idx = default_device
 
-        # hostapis = self._audio.query_hostapis()
-        # devices = self._audio.query_devices()
-        # default_api = self._audio.default.hostapi
-
-        # Show device and api info in logger
-        # _LOGGER.debug("Audio Input Devices:")
-        # for api_idx, api in enumerate(hostapis):
-        #     _LOGGER.debug(
-        #         "Host API: {} {}".format(
-        #             api["name"],
-        #             "[DEFAULT]" if api_idx == default_api else "",
-        #         )
-        #     )
-        #     for idx in api["devices"]:
-        #         device = devices[idx]
-        #         if device["max_input_channels"] > 0:
-        #             _LOGGER.debug(
-        #                 "    [{}] {} {} {}".format(
-        #                     idx,
-        #                     device["name"],
-        #                     "[DEFAULT]" if idx == default_device else "",
-        #                     "[SELECTED]" if idx == device_idx else "",
-        #                 )
-        #             )
-
-        # old, do not use
-        # self.pre_emphasis.set_biquad(1., -self._config['pre_emphasis'], 0, 0, 0)
-
-        # USE THESE FOR SCOTT_MEL OR OTHERS
-        # self.pre_emphasis.set_biquad(1.3662, -1.9256, 0.5621, -1.9256, 0.9283)
-
-        # USE THESE FOR MATT_MEl
-        # weaker bass, good for vocals, highs
-        # self.pre_emphasis.set_biquad(0.87492, -1.74984, 0.87492, -1.74799, 0.75169)
-        # bass heavier overall more balanced
-        # self.pre_emphasis.set_biquad(
-        #     0.85870, -1.71740, 0.85870, -1.71605, 0.71874
-        # )
-
         # Setup a pre-emphasis filter to balance the input volume of lows to highs
         self.pre_emphasis = aubio.digital_filter(3)
-        self.pre_emphasis.set_biquad(0.8268, -1.6536, 0.8268, -1.6536, 0.6536)
+        # depending on the coeffs type, we need to use different pre_emphasis values to make em work better. allegedly.
+        selected_coeff = self._ledfx.config["melbanks"]["coeffs_type"]
+        if selected_coeff == "matt_mel":
+            _LOGGER.debug("Using matt_mel settings for pre-emphasis.")
+            self.pre_emphasis.set_biquad(
+                0.8268, -1.6536, 0.8268, -1.6536, 0.6536
+            )
+        elif selected_coeff == "scott_mel":
+            _LOGGER.debug("Using scott_mel settings for pre-emphasis.")
+            self.pre_emphasis.set_biquad(
+                1.3662, -1.9256, 0.5621, -1.9256, 0.9283
+            )
+        else:
+            _LOGGER.debug("Using generic settings for pre-emphasis")
+            self.pre_emphasis.set_biquad(
+                0.85870, -1.71740, 0.85870, -1.71605, 0.71874
+            )
 
-        # self.pre_emphasis = None,
         freq_domain_length = (self._config["fft_size"] // 2) + 1
 
         self._raw_audio_sample = np.zeros(
@@ -267,10 +296,10 @@ class AudioInputSource:
                     ch = 2
 
             if hostapis[device["hostapi"]]["name"] == "WEB AUDIO":
-                ledfx.api.websocket.ACTIVE_AUDIO_STREAM = (
-                    self._stream
-                ) = WebAudioStream(
-                    device["client"], self._audio_sample_callback
+                ledfx.api.websocket.ACTIVE_AUDIO_STREAM = self._stream = (
+                    WebAudioStream(
+                        device["client"], self._audio_sample_callback
+                    )
                 )
             else:
                 self._stream = self._audio.InputStream(
@@ -307,26 +336,44 @@ class AudioInputSource:
             open_audio_stream(default_device)
 
     def deactivate(self):
-        if self._stream:
-            self._stream.stop()
-            self._stream.close()
-            self._stream = None
-        self._is_activated = False
+        with self.lock:
+            if self._stream:
+                self._stream.stop()
+                self._stream.close()
+                self._stream = None
+            self._is_activated = False
         _LOGGER.info("Audio source closed.")
 
     def subscribe(self, callback):
         """Registers a callback with the input source"""
         self._callbacks.append(callback)
-
         if len(self._callbacks) > 0 and not self._is_activated:
             self.activate()
+        if self._timer is not None:
+            self._timer.cancel()
+            self._timer = None
 
     def unsubscribe(self, callback):
         """Unregisters a callback with the input source"""
         if callback in self._callbacks:
             self._callbacks.remove(callback)
+        if (
+            len(self._callbacks) <= self._subscriber_threshold
+            and self._is_activated
+        ):
+            if self._timer is not None:
+                self._timer.cancel()
+            self._timer = threading.Timer(5.0, self.check_and_deactivate)
+            self._timer.start()
 
-        if len(self._callbacks) <= self._subscriber_threshold:
+    def check_and_deactivate(self):
+        if self._timer is not None:
+            self._timer.cancel()
+        self._timer = None
+        if (
+            len(self._callbacks) <= self._subscriber_threshold
+            and self._is_activated
+        ):
             self.deactivate()
 
     def get_device_index_by_name(self, device_name: str):
@@ -349,14 +396,14 @@ class AudioInputSource:
             processed_audio_sample = self.resampler.process(
                 raw_sample,
                 # MIC_RATE / self._stream.samplerate
-                out_sample_len / in_sample_len
+                out_sample_len / in_sample_len,
                 # end_of_input=True
             )
         else:
             processed_audio_sample = raw_sample
 
         if len(processed_audio_sample) != out_sample_len:
-            _LOGGER.warning(
+            _LOGGER.debug(
                 f"Discarded malformed audio frame - {len(processed_audio_sample)} samples, expected {out_sample_len}"
             )
             return
@@ -439,12 +486,47 @@ class AudioInputSource:
 
 
 class AudioAnalysisSource(AudioInputSource):
+    # https://aubio.org/doc/latest/pitch_8h.html
+    PITCH_METHODS = [
+        "yinfft",
+        "yin",
+        "yinfast",
+        # mcomb and fcomb appears to just explode something deeep in the aubio code, no logs, no errors, it just dies.
+        # "mcomb",
+        # "fcomb",
+        "schmitt",
+        "specacf",
+    ]
+    # https://aubio.org/doc/latest/specdesc_8h.html
+    ONSET_METHODS = [
+        "energy",
+        "hfc",
+        "complex",
+        "phase",
+        "wphase",
+        "specdiff",
+        "kl",
+        "mkl",
+        "specflux",
+    ]
     CONFIG_SCHEMA = vol.Schema(
         {
-            vol.Optional("pitch_method", default="default"): str,
+            vol.Optional(
+                "pitch_method",
+                default="yinfft",
+                description="Method to detect pitch",
+            ): vol.In(PITCH_METHODS),
             vol.Optional("tempo_method", default="default"): str,
-            vol.Optional("onset_method", default="specflux"): str,
-            vol.Optional("pitch_tolerance", default=0.8): float,
+            vol.Optional(
+                "onset_method",
+                default="hfc",
+                description="Method used to detect onsets",
+            ): vol.In(ONSET_METHODS),
+            vol.Optional(
+                "pitch_tolerance",
+                default=0.8,
+                description="Pitch detection tolerance",
+            ): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=2)),
         },
         extra=vol.ALLOW_EXTRA,
     )
@@ -509,7 +591,7 @@ class AudioAnalysisSource(AudioInputSource):
         self.freq_mel_indexes = []
 
         for freq in self.freq_max_mels:
-            assert self.melbanks._config["max_frequencies"][2] >= freq
+            assert self.melbanks.melbanks_config["max_frequencies"][2] >= freq
 
             self.freq_mel_indexes.append(
                 next(
@@ -650,9 +732,11 @@ class AudioAnalysisSource(AudioInputSource):
 
     def get_freq_power(self, i, filtered=True):
         if filtered:
-            return self.freq_power_filter.value[i]
+            value = self.freq_power_filter.value[i]
         else:
-            return self.freq_power_raw[i]
+            value = self.freq_power_raw[i]
+
+        return value if not np.isnan(value) else 0.0
 
     def beat_power(self, filtered=True):
         """
@@ -747,6 +831,21 @@ class AudioReactiveEffect(Effect):
     subclasses. This can be expanded to do the common r/g/b filters.
     """
 
+    # this can be used by inheriting classes for power func selection in schema
+    # see magnitude or scan effect for examples
+    POWER_FUNCS_MAPPING = {
+        "Beat": "beat_power",
+        "Bass": "bass_power",
+        "Lows (beat+bass)": "lows_power",
+        "Mids": "mids_power",
+        "High": "high_power",
+    }
+
+    def __init__(self, ledfx, config):
+        super().__init__(ledfx, config)
+        # protect against possible deactivate race condition
+        self.audio = None
+
     def activate(self, channel):
         _LOGGER.info("Activating AudioReactiveEffect.")
         super().activate(channel)
@@ -776,10 +875,9 @@ class AudioReactiveEffect(Effect):
 
     def _audio_data_updated(self):
         self.melbank.cache_clear()
-        self.lock.acquire()
-        if self.is_active:
-            self.audio_data_updated(self.audio)
-        self.lock.release()
+        with self.lock:
+            if self.is_active:
+                self.audio_data_updated(self.audio)
 
     def audio_data_updated(self, data):
         """
@@ -812,11 +910,11 @@ class AudioReactiveEffect(Effect):
             (
                 i
                 for i, x in enumerate(
-                    self.audio.melbanks._config["max_frequencies"]
+                    self.audio.melbanks.melbanks_config["max_frequencies"]
                 )
                 if x >= self._virtual.frequency_range.max
             ),
-            len(self.audio.melbanks._config["max_frequencies"]),
+            len(self.audio.melbanks.melbanks_config["max_frequencies"]),
         )
 
     @cached_property
@@ -860,6 +958,18 @@ class AudioReactiveEffect(Effect):
         new = np.linspace(0, 1, size)
         return (new, old)
 
+    def melbank_no_nan(self, melbank):
+        # Check for NaN values in the melbank array, replace with 0 in place
+        # Difficult to determine why this happens, but it seems to be related to
+        # the audio input device.
+        # TODO: Investigate why NaNs are present in the melbank array for some people/devices
+        if np.isnan(melbank).any():
+            _LOGGER.warning(
+                "NaN values detected in the melbank array and replaced with 0."
+            )
+            # Replace NaN values with 0
+            np.nan_to_num(melbank, copy=False)
+
     @lru_cache(maxsize=None)
     def melbank(self, filtered=False, size=0):
         """
@@ -878,6 +988,9 @@ class AudioReactiveEffect(Effect):
             melbank = self.audio.melbanks.melbanks[self._selected_melbank][
                 self._melbank_min_idx : self._melbank_max_idx
             ]
+
+        self.melbank_no_nan(melbank)
+
         if size and (self._input_mel_length != size):
             return np.interp(*self._melbank_interp_linspaces(size), melbank)
         else:

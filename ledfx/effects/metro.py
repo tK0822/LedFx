@@ -1,12 +1,18 @@
 import timeit
 
 import numpy as np
-import psutil
 import voluptuous as vol
 
 from ledfx.color import parse_color, validate_color
 from ledfx.effects.audio import AudioReactiveEffect
 from ledfx.utils import Graph, bokeh_available
+
+try:
+    import psutil
+
+    psutil_available = True
+except ImportError:
+    psutil_available = False
 
 # Metro intent is to flash a pattern on led strips so end users can look for
 # sync between separate light strips due to protocol, wifi conditions or other
@@ -19,7 +25,7 @@ class MetroEffect(AudioReactiveEffect):
     NAME = "Metro"
     CATEGORY = "Diagnostic"
     HIDDEN_KEYS = ["background_brightness", "blur", "mirror"]
-    if not bokeh_available:
+    if not bokeh_available or not psutil_available:
         HIDDEN_KEYS.append("capture")
 
     start_time = timeit.default_timer()
@@ -106,12 +112,12 @@ class MetroEffect(AudioReactiveEffect):
             )
         elif not self._config["capture"] and self.graph_callbacks is not None:
             self.graph_callbacks.dump_graph(only_jitter=True)
-            self.lock.acquire()
-            if self.graph_cpu:
-                self.graph_cpu.dump_graph(
-                    jitter=True, sub_title=f"{self._config['cpu_secs']} secs"
-                )
-            self.lock.release()
+            with self.lock:
+                if self.graph_cpu:
+                    self.graph_cpu.dump_graph(
+                        jitter=True,
+                        sub_title=f"{self._config['cpu_secs']} secs",
+                    )
             self.graph_callbacks = None
             self.graph_cpu = None
 
@@ -151,9 +157,9 @@ class MetroEffect(AudioReactiveEffect):
                     for blocks in range(0, step_div):
                         start_pixel = blocks * chunk
                         end_pixel = start_pixel + int(chunk / 2)
-                        self.pixels[
-                            start_pixel : end_pixel - 1
-                        ] = self.flash_color
+                        self.pixels[start_pixel : end_pixel - 1] = (
+                            self.flash_color
+                        )
                 self.was_flash = True
 
         if self.graph_cpu is not None:

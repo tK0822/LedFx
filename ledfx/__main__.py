@@ -4,7 +4,13 @@ Entry point for LedFx.
 To run this script for development purposes use:
 
     poetry install
-    ledfx
+    poetry run ledfx
+
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+WARNING                                                         WARNING
+WARNING  ⚠️⚠️⚠️ DO NOT USE SOUNDDEVICE WITHIN MAIN.PY ⚠️⚠️⚠️ WARNING
+WARNING                                                         WARNING
+WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 
 """
 
@@ -13,6 +19,8 @@ import logging
 import os
 import sys
 from logging.handlers import RotatingFileHandler
+
+from ledfx.sentry_config import setup_sentry
 
 try:
     import psutil
@@ -24,7 +32,13 @@ except ImportError:
 import ledfx.config as config_helpers
 from ledfx.consts import PROJECT_VERSION
 from ledfx.core import LedFxCore
-from ledfx.utils import currently_frozen, get_icon_path
+from ledfx.utils import (
+    check_optional_dependencies,
+    currently_frozen,
+    get_icon_path,
+    log_packages,
+    read_ledfx_dotenv,
+)
 
 
 def reset_logging():
@@ -88,6 +102,7 @@ def setup_logging(loglevel, config_dir):
     logging.getLogger("sacn").setLevel(logging.WARNING)
     logging.getLogger("aiohttp.access").setLevel(logging.WARNING)
     logging.getLogger("zeroconf").setLevel(logging.WARNING)
+    logging.getLogger("lifxdev").setLevel(logging.WARNING)
 
     global _LOGGER
     _LOGGER = logging.getLogger(__name__)
@@ -177,7 +192,7 @@ def parse_args():
         "--offline",
         dest="offline_mode",
         action="store_true",
-        help="Disable sentry crash logger",
+        help="Disable crash logger and auto update checks",
     )
     parser.add_argument(
         "--sentry-crash-test",
@@ -191,43 +206,40 @@ def parse_args():
         action="store_true",
         help="Launch LedFx and then exit after 5 seconds to sanity check the install",
     )
+
+    parser.add_argument(
+        "--clear-config",
+        dest="clear_config",
+        action="store_true",
+        help="Launch LedFx, backup the config, clear the config, and continue with a clean startup",
+    )
+
+    parser.add_argument(
+        "--clear-effects",
+        dest="clear_effects",
+        action="store_true",
+        help="Launch LedFx, load the config, clear all active effects on all virtuals. Effect configurations are persisted, just turned off",
+    )
+
     return parser.parse_args()
 
 
-def log_packages():
-    from platform import (
-        processor,
-        python_build,
-        python_implementation,
-        python_version,
-        release,
-        system,
-    )
-
-    from pkg_resources import working_set
-
-    _LOGGER.debug(f"{system()} : {release()} : {processor()}")
-    _LOGGER.debug(
-        f"{python_version()} : {python_build()} : {python_implementation()}"
-    )
-    _LOGGER.debug("Packages")
-    dists = [d for d in working_set]
-    dists.sort(key=lambda x: x.project_name)
-    for dist in dists:
-        _LOGGER.debug(f"{dist.project_name} : {dist.version}")
-
-
 def main():
-    """Main entry point allowing external calls"""
+    """
+    Main entry point allowing external calls
+    """
+
     args = parse_args()
     config_helpers.ensure_config_directory(args.config)
     setup_logging(args.loglevel, config_dir=args.config)
     config_helpers.load_logger()
-
+    read_ledfx_dotenv()
+    if _LOGGER.isEnabledFor(logging.DEBUG):
+        log_packages()
+    check_optional_dependencies()
     # Set some process priority optimisations
     if have_psutil:
         p = psutil.Process(os.getpid())
-
         if psutil.WINDOWS:
             try:
                 p.nice(psutil.HIGH_PRIORITY_CLASS)
@@ -242,17 +254,16 @@ def main():
                 p.ionice(psutil.IOPRIO_CLASS_RT, value=7)
             except psutil.Error:
                 _LOGGER.info(
-                    "Unable to set priority, please run as root or sudo if you are experiencing frame rate issues",
+                    "Unable to set priority, please run as root or use sudo if you are experiencing frame rate issues",
                 )
         else:
             p.nice(15)
 
     if args.offline_mode is False:
-        import ledfx.sentry_config  # noqa: F401
+        setup_sentry()
 
     if args.sentry_test:
-        """This will crash LedFx and submit a Sentry error if Sentry is configured"""
-        _LOGGER.warning("Steering LedFx into a brick wall")
+        _LOGGER.warning("Steering LedFx into a brick wall.")
         div_by_zero = 1 / 0
 
     if (args.tray or currently_frozen()) and not args.no_tray:
@@ -260,10 +271,10 @@ def main():
         try:
             import pystray
         except Exception as Error:
-            msg = f"Error: Unable to virtual tray icon. Shutting down. Error: {Error}"
+            msg = f"Unable to create tray icon. Error: {Error}. Try launching LedFx via --no-tray option."
             _LOGGER.critical(msg)
-            raise Exception(msg)
-            sys.exit(0)
+            # Exit with code 3 to indicate that there was an error creating the tray icon.
+            sys.exit(3)
 
         from PIL import Image
 
@@ -274,9 +285,6 @@ def main():
         )
     else:
         icon = None
-
-    if _LOGGER.isEnabledFor(logging.DEBUG):
-        log_packages()
 
     if icon:
         icon.run(setup=entry_point)
@@ -302,6 +310,9 @@ def entry_point(icon=None):
             port_s=args.port_s,
             icon=icon,
             ci_testing=args.ci_smoke_test,
+            clear_config=args.clear_config,
+            clear_effects=args.clear_effects,
+            offline_mode=args.offline_mode,
         )
 
         exit_code = ledfx.start(open_ui=args.open_ui)

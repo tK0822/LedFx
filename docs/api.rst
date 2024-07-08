@@ -222,21 +222,30 @@ if no device is found will return an error
         "error": "Failed to find launchpad"
     }
 
-/api/find_openrgb/?server=1.2.3.4&port=5678
+/api/find_openrgb
 ===========================================
-
-.. rubric:: GET
-
-Optional Query parameters are supported as follows:
-
-'**server**' (optional): IP address of openRGB server, a default value of loacl host will be used
-'**port**' (optional): Port to be used for openRGB server. a default value of 6742 will be used
-
-In most cases these do not need to be defined as defaults of localhost and 6742 are used
 
 Returns all found openRGB devices registered with the openRGB server
 
-example:
+.. rubric:: GET
+
+The GET call uses default values of 127.0.0.1:6742 for the openRGB server
+
+.. rubric:: POST
+
+JSON parameters are supported as follows:
+
+| '**server**' (optional): IP address of openRGB server, a default value of 127.0.0.1 will be used
+| '**port**' (optional): Port to be used for openRGB server, a default value of 6742 will be used
+
+.. code-block:: json
+
+    {
+      "server": "1.2.3.4",
+      "port": 1234
+    }
+
+example reponse:
 
 .. code-block:: json
 
@@ -329,7 +338,7 @@ Endpoint Details
 Request
 -------
 
-- **Method**: GET
+- **Method**: POST
 - **Request Data**:
   - ``path_url`` (String): The URL or local file path of the GIF image from which frames are to be extracted.
 
@@ -389,6 +398,14 @@ Or, for a local file:
       "path_url": "/path/to/local/image.gif"
     }
 
+Windows example
+
+.. code-block:: json
+
+    {
+      "path_url": "C:\\path\\to\\local\\image.gif"
+    }
+
 Sample Response
 ^^^^^^^^^^^^^^^
 
@@ -402,6 +419,100 @@ A successful response with two extracted frames might look like this:
         "<base64-encoded JPEG data>",
         "<base64-encoded JPEG data>"
       ]
+    }
+
+/api/get_image
+===========================================
+
+Overview
+--------
+
+A RESTful endpoint designed for retrieving an image. Clients can request a file by providing either the URL or the local file path of the image resource. The image is returned in JPEG format for efficient data transmission.
+
+Endpoint Details
+----------------
+
+- **Endpoint Path**: ``/api/get_image``
+
+Request
+-------
+
+- **Method**: POST
+- **Request Data**:
+  - ``path_url`` (String): The URL or local file path of the image from to be opened.
+
+Response
+--------
+
+- **Success**:
+
+  - Status Code: 200
+
+  - Body:
+
+    - ``image`` (String): A base64 encoded image in JPEG format.
+
+- **Failure**:
+
+  - Status Code: 400 (Bad Request)
+
+    - When JSON decoding fails or the required attribute ``path_url`` is not provided.
+
+  - Status Code: 404 (Not Found)
+
+    - When the image at the specified URL or file path cannot be opened or processed.
+
+Error Handling
+--------------
+
+In case of an error, the endpoint returns a JSON object with the following structure:
+
+.. code-block:: json
+
+    {
+      "status": "failed",
+      "reason": "<error reason>"
+    }
+
+Usage Example
+-------------
+
+Requesting Image
+^^^^^^^^^^^^^^^^^^^^^
+
+To request an image, send a GET request with either the URL or local file path in the request data:
+
+.. code-block:: json
+
+    {
+      "path_url": "http://example.com/image.gif"
+    }
+
+Or, for a local file:
+
+.. code-block:: json
+
+    {
+      "path_url": "/path/to/local/image.gif"
+    }
+
+Windows example
+
+.. code-block:: json
+
+    {
+      "path_url": "C:\\path\\to\\local\\image.gif"
+    }
+
+Sample Response
+^^^^^^^^^^^^^^^
+
+A successful response with image data might look like this:
+
+.. code-block:: json
+
+    {
+      "image": "<base64-encoded JPEG data>"
     }
 
 /api/effects
@@ -648,7 +759,7 @@ Extensible support for general tools towards a specified virtual
 
 .. rubric:: PUT
 
-Supports tool instances of force_color, calibration, highlight and oneshot others may be added in the future
+Supports tool instances of force_color, calibration, highlight, oneshot and copy, others may be added in the future
 
 **force_color**
 
@@ -792,6 +903,33 @@ The virtual must be active or an error will be returned
         "status": "failed",
         "reason": "virtual falcon1 is not active"
     }
+
+
+**copy**
+
+| Copy the active effect config of <virtual_id> to a list of other virtuals
+
+| target: A list of virtual ids to copy the active effect config to
+
+.. code-block:: json
+
+    {
+        "tool":"copy",
+        "target":["my_virtual1","my_virtual2","my_virtual3"]
+    }
+
+returns
+
+.. code-block:: json
+
+    {
+        "status": "success",
+        "tool": "copy"
+    }
+
+| The virtual must have an active or an error will be returned
+| target must be a list of virtual ids or an error will be returned
+| At least one virtual effect copy must be successful or an error will be returned
 
 /api/effects/<effect_id>/presets
 ===================================

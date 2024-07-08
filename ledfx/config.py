@@ -27,6 +27,29 @@ _default_wled_settings = {
     "inactivity_timeout": 1,
 }
 
+CONFIG_BACKUP_REASONS = {
+    "DECODE": "Error loading config. Backup created, default config used.",
+    "VERSION": "Old config version detected. Backup created.",
+    "OSERROR": "Unable to open config. Backup Created, default config used.",
+    "IMPORT": "Config imported. Backup Created.",
+    "DELETE": "Config deleted. Backup Created.",
+}
+
+# Some core config keys that don't need a restart to take effect - list them here to use elsewhere
+CORE_CONFIG_KEYS_NO_RESTART = [
+    "global_brightness",
+    "create_segments",
+    "scan_on_startup",
+    "user_presets",
+    "visualisation_maxlen",
+    "visualisation_fps",
+]
+# Collection of keys that are used for visualisation configuration - used to check if we need to restart the visualisation event listeners
+VISUALISATION_CONFIG_KEYS = [
+    "visualisation_fps",
+    "visualisation_maxlen",
+]
+
 
 # Transmission types for pixel visualisation on frontend
 class Transmission:
@@ -87,6 +110,7 @@ CORE_CONFIG_SCHEMA = vol.Schema(
         vol.Optional("devices", default=[]): list,
         vol.Optional("virtuals", default=[]): list,
         vol.Optional("audio", default={}): dict,
+        vol.Optional("melbank_collection", default=[]): list,
         vol.Optional("melbanks", default={}): dict,
         vol.Optional("ledfx_presets", default={}): dict,
         vol.Optional("user_presets", default={}): dict,
@@ -123,12 +147,25 @@ CORE_CONFIG_SCHEMA = vol.Schema(
 
 
 def load_logger():
+    """
+    Load the logger for the current module.
+
+    This function initializes the logger for the current module using the module's name as the logger name.
+
+    Returns:
+        None
+    """
     global _LOGGER
     _LOGGER = logging.getLogger(__name__)
 
 
 def get_default_config_directory() -> str:
-    """Get the default configuration directory"""
+    """
+    Get the default configuration directory.
+
+    Returns:
+        str: The default configuration directory path.
+    """
 
     base_dir = (
         os.getenv("APPDATA") if os.name == "nt" else os.path.expanduser("~")
@@ -136,8 +173,26 @@ def get_default_config_directory() -> str:
     return os.path.join(base_dir, CONFIG_DIRECTORY)
 
 
+def get_default_config_path() -> str:
+    """
+    Get the default fully qualified configuration file path.
+
+    Returns:
+        str: The fully qualified configuration file path.
+    """
+    return os.path.join(get_default_config_directory(), CONFIG_FILE_NAME)
+
+
 def get_config_file(config_dir: str) -> str:
-    """Finds a supported configuration file in the provided directory"""
+    """
+    Finds a supported configuration file in the provided directory.
+
+    Args:
+        config_dir (str): The directory to search for the configuration file.
+
+    Returns:
+        str: The path of the configuration file if found, None otherwise.
+    """
 
     json_path = os.path.join(config_dir, CONFIG_FILE_NAME)
     if os.path.isfile(json_path) is False:  # Can't find a JSON file
@@ -146,7 +201,16 @@ def get_config_file(config_dir: str) -> str:
 
 
 def get_preset_file(config_dir: str) -> str:
-    """Finds a supported preset file in the provided directory"""
+    """
+    Finds a supported preset file in the provided directory
+    Currently this is a stub and is not used. It is here for potential future use.
+
+    Args:
+        config_dir (str): The directory to search for the preset file.
+
+    Returns:
+        str: The path of the found preset file, or None if no valid preset file is found.
+    """
 
     json_path = os.path.join(config_dir, PRESETS_FILE_NAME)
     if os.path.isfile(json_path) is False:  # Can't find a JSON file
@@ -154,18 +218,44 @@ def get_preset_file(config_dir: str) -> str:
     return json_path  # Return the JSON file if we find one.
 
 
-def get_profile_dump_location(config_dir) -> str:
+def get_profile_dump_location(config_dir: str) -> str:
+    """
+    Returns the location for dumping the profile.
+
+    Args:
+        config_dir (str): The directory where the profile dump will be stored.
+
+    Returns:
+        str: The complete path for dumping the profile.
+    """
     date_time = datetime.datetime.now().strftime("%d-%m-%y_%H-%M-%S")
     return os.path.join(config_dir, f"LedFx_{date_time}.profile")
 
 
-def get_log_file_location(config_dir):
-    log_file_path = os.path.abspath(os.path.join(config_dir, "LedFx.log"))
+def get_log_file_location(config_dir: str) -> str:
+    """
+    Returns the absolute file path of the log file.
+
+    Args:
+        config_dir (str): The directory where the log file should be located.
+
+    Returns:
+        str: The absolute file path of the log file.
+    """
+    log_file_path = os.path.abspath(os.path.join(config_dir, "ledfx.log"))
     return log_file_path
 
 
 def get_ssl_certs(config_dir) -> tuple:
-    """Finds ssl certificate files in config dir"""
+    """
+    Finds ssl certificate files in the specified config directory.
+
+    Args:
+        config_dir (str): The path to the config directory.
+
+    Returns:
+        tuple: A tuple containing the paths to the chain and key files if they exist, otherwise None.
+    """
     ssl_dir = os.path.join(config_dir, "ssl")
 
     if not os.path.exists(ssl_dir):
@@ -180,8 +270,18 @@ def get_ssl_certs(config_dir) -> tuple:
 
 
 def create_default_config(config_dir: str) -> str:
-    """Creates a default configuration in the provided directory"""
+    """
+    Creates a default configuration file in the provided directory.
 
+    Args:
+        config_dir (str): The directory where the configuration file will be created.
+
+    Returns:
+        str: The path of the created configuration file.
+
+    Raises:
+        OSError: If there is an error creating the configuration file.
+    """
     config_path = os.path.join(config_dir, CONFIG_FILE_NAME)
     try:
         with open(config_path, "w", encoding="utf-8") as file:
@@ -195,14 +295,23 @@ def create_default_config(config_dir: str) -> str:
         return config_path
 
     except OSError:
-        print(f"Unable to create default configuration file {config_path}.")
-
+        _LOGGER.critical(
+            f"Unable to create default configuration file {config_path}."
+        )
         return None
 
 
 def ensure_config_file(config_dir: str) -> str:
-    """Checks if a config file exists, and otherwise creates one"""
+    """
+    Checks if a config file exists, and otherwise creates one
 
+    Args:
+        config_dir (str): The directory where the config file should be located
+
+    Returns:
+        str: The path to the config file
+
+    """
     ensure_config_directory(config_dir)
     config_path = get_config_file(config_dir)
     if config_path is None:
@@ -212,6 +321,16 @@ def ensure_config_file(config_dir: str) -> str:
 
 
 def check_preset_file(config_dir: str) -> str:
+    """
+    Checks if a preset file exists in the specified configuration directory.
+    Currently this is a stub and is not used. It is here for potential future use.
+
+    Args:
+        config_dir (str): The path to the configuration directory.
+
+    Returns:
+        str: The path to the preset file if it exists, otherwise None.
+    """
     ensure_config_directory(config_dir)
     presets_path = get_preset_file(config_dir)
     if presets_path is None:
@@ -221,8 +340,16 @@ def check_preset_file(config_dir: str) -> str:
 
 
 def ensure_config_directory(config_dir: str) -> None:
-    """Validate that the config directory is valid."""
+    """
+    Validate that the config directory is valid.
 
+    Args:
+        config_dir (str): The path to the config directory.
+
+    Raises:
+        OSError: If unable to create the configuration directory.
+
+    """
     # If an explicit path is provided simply check if it exist and failfast
     # if it doesn't. Otherwise, if we have the default directory attempt to
     # create the file
@@ -230,16 +357,27 @@ def ensure_config_directory(config_dir: str) -> None:
         try:
             os.mkdir(config_dir)
         except OSError:
-            print(
-                ("Error: Unable to create configuration directory {}").format(
-                    config_dir
-                )
+            _LOGGER.critical(
+                f"Unable to create configuration directory at {config_dir}. Shutting down."
             )
+            # Exit with code 1 to indicate that there was an error creating the configuration directory.
             sys.exit(1)
 
 
 def load_config(config_dir: str) -> dict:
-    """Validates and loads the configuration file in the provided directory"""
+    """
+    Validates and loads the configuration file in the provided directory.
+
+    Args:
+        config_dir (str): The directory where the configuration file is located.
+
+    Returns:
+        dict: The loaded and validated configuration as a dictionary.
+
+    Raises:
+        JSONDecodeError: If the configuration file cannot be decoded as JSON.
+        OSError: If there is an error while opening or reading the configuration file.
+    """
 
     config_file = ensure_config_file(config_dir)
     print(
@@ -249,8 +387,6 @@ def load_config(config_dir: str) -> dict:
         with open(config_file, encoding="utf-8") as file:
             config_json = json.load(file)
             try:
-                # If there's no config version in the config, it's pre-1.0.0 and won't work
-                # Probably scope to iterate through it and create a virtual for every device, but that's beyond me
                 _LOGGER.info(
                     f"LedFx Configuration Version: {config_json['configuration_version']}"
                 )
@@ -259,7 +395,7 @@ def load_config(config_dir: str) -> dict:
                 ) == parse_version(CONFIGURATION_VERSION)
                 return CORE_CONFIG_SCHEMA(config_json)
             except (KeyError, AssertionError):
-                create_backup(config_dir, config_file, "VERSION")
+                create_backup(config_dir, "VERSION")
                 _LOGGER.warning(
                     f"LedFx config version: {CONFIGURATION_VERSION}, your config version: {config_json.get('configuration_version', 'UNDEFINED (old!)')}"
                 )
@@ -273,21 +409,28 @@ def load_config(config_dir: str) -> dict:
                     config = {}
                 return CORE_CONFIG_SCHEMA(config)
     except json.JSONDecodeError:
-        create_backup(config_dir, config_file, "DECODE")
+        create_backup(config_dir, "DECODE")
         return CORE_CONFIG_SCHEMA({})
     except OSError:
-        create_backup(config_dir, config_file, "OSERROR")
+        create_backup(config_dir, "OSERROR")
         return CORE_CONFIG_SCHEMA({})
 
 
 def migrate_config(old_config):
     """
-    attempts to update an old config to a working state
+    Attempts to update an old config to a working state
+
+    Args:
+        old_config (dict): The old configuration to be migrated.
+
+    Returns:
+        dict: The migrated configuration.
     """
     _LOGGER.warning("Attempting to migrate old config to new version...")
 
     # most invalid keys were from invalid frequency ranges.
     # this replacement dict should fix that
+    # oldkey: newkey
     replacement_frequency_ranges = {
         "Ultra Low (1-20Hz)": "Beat",
         "Sub Bass (20-60Hz)": "Lows (beat+bass)",
@@ -297,6 +440,42 @@ def migrate_config(old_config):
         "Upper Midrange (2Khz-4kHz)": "Mids",
         "High Midrange (4kHz-6kHz)": "High",
         "High Frequency (6kHz-24kHz)": "High",
+    }
+
+    # These keys were renamed in the schema, so we need to replace them
+    # oldkey: newkey
+    other_replacement_keys = {
+        "flip horizontal": "flip_horizontal",
+        "flip vertical": "flip_vertical",
+        "peak percent": "peak_percent",
+        "peak decay": "peak_decay",
+        "peak marks": "peak_marks",
+        "max vs mean": "max_vs_mean",
+        "spin multiplier": "spin_multiplier",
+        "spin decay": "spin_decay",
+        "GIF FPS": "gif_fps",
+        "Min Size": "min_size",
+        "pp skip": "ping_pong_skip",
+        "stretch hor": "stretch_horizontal",
+        "stretch ver": "stretch_vertical",
+        "v_stretch": "stretch_vertical",
+        "center hor": "center_horizontal",
+        "center ver": "center_vertical",
+        "gif_path": "image_location",
+        "gif at": "image_location",
+        "beat frames": "beat_frames",
+        "skip frames": "skip_frames",
+        "force aspect": "keep_aspect_ratio",
+        "force fit": "force_fit",
+        "ping pong": "ping_pong",
+        "half beat": "half_beat",
+        "v density": "density_vertical",
+        "size x": "size_multiplication",
+        "speed x": "speed_multiplication",
+        "Alpha": "alpha_options",
+        "Diagnostic": "diag",
+        "RGB Mix": "rgb_mix",
+        "diag2": "deep_diag",
     }
 
     class DummyLedfx:
@@ -313,7 +492,26 @@ def migrate_config(old_config):
 
     # initialise some things that will help us match up old effect info to new effect info
     def get_matching_effect_id(dirty_effect_id):
+        """
+        Returns the effect ID that matches the given dirty_effect_id.
+
+        Args:
+            dirty_effect_id (str): The dirty effect ID to match.
+
+        Returns:
+            str or None: The matching effect ID, or None if no match is found.
+        """
+
         def clean_effect_id(effect_id):
+            """
+            Cleans up the effect ID by converting it to lowercase and removing "(reactive)" and underscores.
+
+            Args:
+                effect_id (str): The effect ID to be cleaned.
+
+            Returns:
+                str: The cleaned effect ID.
+            """
             return effect_id.lower().replace("(reactive)", "").replace("_", "")
 
         candidate_effect_id = clean_effect_id(dirty_effect_id)
@@ -324,11 +522,24 @@ def migrate_config(old_config):
             return None
 
     def sanitise_effect_config(effect_type, old_config):
+        """
+        Sanitizes the effect configuration by attempting to find old keys or values and replace them
+
+        Args:
+            effect_type (str): The type of effect.
+            old_config (dict): The original effect configuration.
+
+        Returns:
+            dict: The sanitized effect configuration.
+        """
         # checks each config key against the current schema, discarding any values that dont match
         schema = effects[effect_type].schema().schema
         new_config = {}
         for old_key in old_config:
-            new_key = old_key.replace("colour", "color")
+            # Replace old key with new key if it exists in the other_replacement_keys dictionary
+            new_key = other_replacement_keys.get(old_key, old_key).replace(
+                "colour", "color"
+            )
             if new_key in schema:
                 try:
                     if (
@@ -511,47 +722,54 @@ def migrate_config(old_config):
             "name": scenes[scene_id]["name"],
         }
 
+    # if audio:min_volume is present and greater than 1 then set to a default of
+    # 0.2, old range was 0 to 10, but effective range is only 0 to 1, anything
+    # >= 1 will just squelch all audio, source of error for some users while
+    # trying to make audio work and blindly pushing sliders
+    if new_config.get("audio", {}).get("min_volume", 0) > 1:
+        new_config["audio"]["min_volume"] = 0.2
+
     _LOGGER.warning("Finished migrating config.")
     return new_config
 
 
-def create_backup(config_dir, config_file, errortype):
-    """This function creates a backup of the current configuration file - it uses the format dd-mm-yyyy_hh-mm-ss for the backup file.
+def create_backup(config_dir: str, backup_reason: str) -> None:
+    """
+    This function creates a backup of the current configuration file - it uses the format dd-mm-yyyy_hh-mm-ss for the backup file.
 
     Args:
         config_dir (path): The path to the current configuration directory
-        config_file (path): The path to the current configuration file
-        errortype (string): The type of error we encounter to allow for better logging
+        backup_reason (string): The reason we are making the backup to allow for better logging
     """
 
+    config_file = os.path.join(config_dir, CONFIG_FILE_NAME)
     date = datetime.datetime.now().strftime("%d-%m-%y_%H-%M-%S")
     backup_location = os.path.join(config_dir, f"config_backup_{date}.json")
-    try:
-        os.rename(config_file, backup_location)
-    except OSError:
-        shutil.copy2(config_file, backup_location)
+    if os.path.exists(config_file):
+        try:
+            os.rename(config_file, backup_location)
+        except OSError:
+            shutil.copy2(config_file, backup_location)
 
-    if errortype == "DECODE":
-        _LOGGER.warning(
-            "Error loading configuration. Backup created, empty configuration used."
-        )
-
-    if errortype == "VERSION":
-        _LOGGER.warning("Incompatible Configuration Detected. Backup Created.")
-
-    if errortype == "OSERROR":
-        _LOGGER.warning(
-            "Unable to Open Configuration. Backup Created, empty configuration used."
-        )
-
-    _LOGGER.warning(f"Backup Located at: {backup_location}")
+        if backup_reason in CONFIG_BACKUP_REASONS:
+            _LOGGER.warning(CONFIG_BACKUP_REASONS[backup_reason])
+        else:
+            _LOGGER.error("Unknown Error. Backup Created.")
 
 
 def save_config(config: dict, config_dir: str) -> None:
-    """Saves the configuration to the provided directory"""
+    """
+    Saves the configuration to the provided directory.
 
+    Args:
+        config (dict): The configuration to be saved.
+        config_dir (str): The directory where the configuration file will be saved.
+
+    Returns:
+        None
+    """
     config_file = ensure_config_file(config_dir)
-    _LOGGER.info(("Saving configuration file to {}").format(config_dir))
+    _LOGGER.info(f"Saving configuration file to {config_dir}")
     config["configuration_version"] = CONFIGURATION_VERSION
     config_view = dict(config)
     unneeded_keys = ["ledfx_presets"]
@@ -565,10 +783,20 @@ def save_config(config: dict, config_dir: str) -> None:
 
 
 def save_presets(config: dict, config_dir: str) -> None:
-    """Saves the configuration to the provided directory"""
+    """
+    Saves the configuration to the provided directory.
+    Currently this is a stub and is not used. It is here for potential future use.
+
+    Args:
+        config (dict): The configuration dictionary.
+        config_dir (str): The directory to save the configuration to.
+
+    Returns:
+        None
+    """
 
     presets_file = check_preset_file(config_dir)
-    _LOGGER.info(("Saving user presets to {}").format(config_dir))
+    _LOGGER.info(f"Saving user presets to {config_dir}")
 
     config_view = dict(config)
     for key in [key for key in config_view if key != "user_presets"]:
@@ -578,3 +806,19 @@ def save_presets(config: dict, config_dir: str) -> None:
         json.dump(
             config_view, file, ensure_ascii=False, sort_keys=True, indent=4
         )
+
+
+def remove_virtuals_active_effects(config: dict) -> None:
+    """
+    Removes active effects from virtuals
+    All effects configs will remain in the virtuals, but the active effect will be removed
+    This allows for recovery from scenarios where an effect configuration is poisened
+    The user retains all their other settings.
+    The poisoned effect config will still be present in the virtuals effects list and will crash the app if it is selected
+    This may be addreessed by future fixes in the application or manual removal
+    of the effect from virtuals effects list once it is identified
+    This can only be identified via selective activation of effects to the point of crash
+    """
+
+    for virtual in config["virtuals"]:
+        virtual.pop("effect", None)

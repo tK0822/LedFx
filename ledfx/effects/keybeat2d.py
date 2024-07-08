@@ -1,70 +1,76 @@
 import logging
 import os
 
-import PIL.Image as Image
+import PIL.ImageEnhance as ImageEnhance
 import PIL.ImageSequence as ImageSequence
 import voluptuous as vol
 
 from ledfx.consts import LEDFX_ASSETS_PATH
-from ledfx.effects.gradient import GradientEffect
+from ledfx.effects.gifbase import GifBase
 from ledfx.effects.twod import Twod
 from ledfx.utils import (
+    clip_at_limit,
     extract_positive_integers,
     get_mono_font,
     open_gif,
-    remove_values_above_limit,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Keybeat2d(Twod, GradientEffect):
+class Keybeat2d(Twod, GifBase):
     NAME = "Keybeat2d"
     CATEGORY = "Matrix"
     HIDDEN_KEYS = Twod.HIDDEN_KEYS + [
         "background_color",
-        "gradient_roll",
-        "gradient",
     ]
-    ADVANCED_KEYS = Twod.ADVANCED_KEYS + ["diag2", "fake_beat", "pp skip"]
+    ADVANCED_KEYS = Twod.ADVANCED_KEYS + [
+        "deep_diag",
+        "fake_beat",
+        "pp_skip",
+        "resize_method",
+        "image_brightness",
+    ]
 
     CONFIG_SCHEMA = vol.Schema(
         {
             vol.Optional(
-                "stretch hor",
+                "stretch_horizontal",
                 description="Percentage of original to matrix width",
                 default=100,
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=200)),
             vol.Optional(
-                "stretch ver",
+                "stretch_vertical",
                 description="Percentage of original to matrix height",
                 default=100,
             ): vol.All(vol.Coerce(int), vol.Range(min=1, max=200)),
             vol.Optional(
-                "center hor",
+                "center_horizontal",
                 description="Center offset in horizontal direction percent of matrix width",
                 default=0,
             ): vol.All(vol.Coerce(int), vol.Range(min=-95, max=95)),
             vol.Optional(
-                "center ver",
+                "center_vertical",
                 description="Center offset in vertical direction percent of matrix height",
                 default=0,
             ): vol.All(vol.Coerce(int), vol.Range(min=-95, max=95)),
             vol.Optional(
-                "gif at", description="Load gif from url or path", default=""
+                "image_location",
+                description="Load gif from url or path",
+                default="",
             ): str,
             vol.Optional(
-                "beat frames",
+                "beat_frames",
                 description="Frame index to interpolate beats between",
                 default="",
             ): str,
             vol.Optional(
-                "skip frames",
+                "skip_frames",
                 description="Frames to remove from gif animation",
                 default="",
             ): str,
             vol.Optional(
-                "diag2",
+                "deep_diag",
                 description="Diagnostic overlayed on matrix",
                 default=False,
             ): bool,
@@ -74,30 +80,35 @@ class Keybeat2d(Twod, GradientEffect):
                 default=False,
             ): bool,
             vol.Optional(
-                "force aspect",
+                "keep_aspect_ratio",
                 description="Preserve aspect ratio if force fit",
                 default=False,
             ): bool,
             vol.Optional(
-                "force fit",
+                "force_fit",
                 description="Force fit to matrix",
                 default=False,
             ): bool,
             vol.Optional(
-                "pp skip",
+                "ping_pong_skip",
                 description="When ping pong, skip the first beat key frame on both ends, use when key beat frames are very close to start and ends only",
                 default=False,
             ): bool,
             vol.Optional(
-                "ping pong",
+                "ping_pong",
                 description="Play gif forward and reverse, not just loop",
                 default=False,
             ): bool,
             vol.Optional(
-                "half beat",
+                "half_beat",
                 description="half the beat input impulse, slow things down",
                 default=False,
             ): bool,
+            vol.Optional(
+                "image_brightness",
+                description="Image brightness",
+                default=1.0,
+            ): vol.All(vol.Coerce(float), vol.Range(min=0.1, max=3.0)),
         }
     )
 
@@ -108,20 +119,20 @@ class Keybeat2d(Twod, GradientEffect):
 
     def config_updated(self, config):
         super().config_updated(config)
-        self.stretch_h = self._config["stretch hor"] / 100.0
-        self.stretch_v = self._config["stretch ver"] / 100.0
-        self.center_h = self._config["center hor"] / 100.0
-        self.center_v = self._config["center ver"] / 100.0
+        self.stretch_h = self._config["stretch_horizontal"] / 100.0
+        self.stretch_v = self._config["stretch_vertical"] / 100.0
+        self.center_h = self._config["center_horizontal"] / 100.0
+        self.center_v = self._config["center_vertical"] / 100.0
 
-        self.url_gif = self._config["gif at"]
+        self.image_location = self._config["image_location"]
 
-        self.ping_pong = self._config["ping pong"]
-        self.pp_skip = self._config["pp skip"]
-        self.force_fit = self._config["force fit"]
-        self.force_aspect = self._config["force aspect"]
+        self.ping_pong = self._config["ping_pong"]
+        self.ping_pong_skip = self._config["ping_pong_skip"]
+        self.force_fit = self._config["force_fit"]
+        self.force_aspect = self._config["keep_aspect_ratio"]
         self.fake_beat = self._config["fake_beat"]
-        self.diag2 = self._config["diag2"]
-        self.half_beat = self._config["half beat"]
+        self.deep_diag = self._config["deep_diag"]
+        self.half_beat = self._config["half_beat"]
 
         self.frames = []
         self.reverse = False
@@ -130,9 +141,9 @@ class Keybeat2d(Twod, GradientEffect):
         self.default = os.path.join(LEDFX_ASSETS_PATH, "gifs", "skull.gif")
 
         # attempt to load gif, default on error or no url to test pattern
-        if self.last_gif != self.url_gif:
-            if self.url_gif:
-                self.gif = open_gif(self.url_gif)
+        if self.last_gif != self.image_location:
+            if self.image_location:
+                self.gif = open_gif(self.image_location)
 
             if self.gif is None:
                 self.gif = open_gif(self.default)
@@ -142,22 +153,22 @@ class Keybeat2d(Twod, GradientEffect):
             self.orig_frames = []
 
             for frame in iterator:
-                self.orig_frames.append(frame.copy())
+                self.orig_frames.append(frame.convert("RGB"))
             self.gif.close()
 
-        self.last_gif = self.url_gif
+        self.last_gif = self.image_location
         self.beat = 0.0  # beat oscillator
         self.frame_c = 0  # current frame index to render
         self.frame_s = 0  # seq frame index for when wrapping around
         self.f_beat = 0.0  # fake beat oscillator
 
         self.framecount = len(self.orig_frames)
-        self.beat_frames = remove_values_above_limit(
-            sorted(extract_positive_integers(self._config["beat frames"])),
+        self.beat_frames = clip_at_limit(
+            sorted(extract_positive_integers(self._config["beat_frames"])),
             len(self.orig_frames),
         )
-        self.skip_frames = remove_values_above_limit(
-            sorted(extract_positive_integers(self._config["skip frames"])),
+        self.skip_frames = clip_at_limit(
+            sorted(extract_positive_integers(self._config["skip_frames"])),
             len(self.orig_frames),
         )
 
@@ -176,6 +187,12 @@ class Keybeat2d(Twod, GradientEffect):
 
         # strip out None frames
         self.post_frames = [img for img in self.post_frames if img is not None]
+        self.post_frames = [
+            ImageEnhance.Brightness(frame).enhance(
+                self._config["image_brightness"]
+            )
+            for frame in self.post_frames
+        ]
 
         if self.diag:
             _LOGGER.info(
@@ -231,7 +248,7 @@ class Keybeat2d(Twod, GradientEffect):
             ]
 
             # its hard to decide if this makes sense as a feature
-            if self.pp_skip and len(beat_frames_ext) >= 2:
+            if self.ping_pong_skip and len(beat_frames_ext) >= 2:
                 beat_frames_ext = beat_frames_ext[:-1]
                 self.beat_frames = self.beat_frames[:-1]
 
@@ -316,7 +333,9 @@ class Keybeat2d(Twod, GradientEffect):
             stretch_height = max(1, stretch_height)
 
             self.frames.append(
-                frame.resize((stretch_width, stretch_height), Image.BICUBIC)
+                frame.resize(
+                    (stretch_width, stretch_height), self.resize_method
+                )
             )
 
         self.offset_x = int(
@@ -328,14 +347,14 @@ class Keybeat2d(Twod, GradientEffect):
             + (self.center_v * self.r_height)
         )
 
-        if self.diag2:
+        if self.deep_diag:
             self.font = get_mono_font(10)
 
             self.beat_times = []  # rolling window of beat timestamps
             self.beat_f_times = []  # rolling windows of frame info
-            self.begin = self.start  # used for seconds running total
+            self.begin_time = self.current_time
 
-        self.last_beat_t = self.start
+        self.last_beat_t = self.current_time
 
     def audio_data_updated(self, data):
         if self.half_beat:
@@ -347,22 +366,24 @@ class Keybeat2d(Twod, GradientEffect):
         # add beat timestamps to the rolling window beat_list
         # use len of beat_list as bpm
         if beat_kick:
-            self.beat_times.append(self.start)
+            self.beat_times.append(self.current_time)
             color = (255, 255, 255)
         elif skip_beat:
             color = (255, 0, 0)
         else:
             color = (255, 0, 255)
 
-        self.beat_f_times.append((self.start, self.beat, self.frame_c, color))
+        self.beat_f_times.append(
+            (self.current_time, self.beat, self.frame_c, color)
+        )
         # cull any beats older than 60 seconds
         self.beat_times = [
-            beat for beat in self.beat_times if self.start - beat < 60.0
+            beat for beat in self.beat_times if self.current_time - beat < 60.0
         ]
         self.beat_f_times = [
             f_beat
             for f_beat in self.beat_f_times
-            if self.start - f_beat[0] < 60.0
+            if self.current_time - f_beat[0] < 60.0
         ]
 
         # lets graph directly into the draw space
@@ -384,9 +405,10 @@ class Keybeat2d(Twod, GradientEffect):
                 break
 
         # if we have not reached a 60 second window yet, then gestimate bpm
-        passed = self.start - self.begin
+        passed = self.current_time - self.begin_time
         self.bpm = len(self.beat_times)
-        if passed < 60.0:
+
+        if passed > 0 and passed < 60.0:
             self.bpm *= 60 / passed
             color = (255, 0, 255)
         else:
@@ -415,11 +437,11 @@ class Keybeat2d(Twod, GradientEffect):
         # if we see beat go from a larger number to a smaller one, we hit a beat
         if self.beat < self.last_beat:
             # protect against false beats with less than 100ms ~= 600 bpm!
-            if self.start - self.last_beat_t < 0.1:
+            if self.current_time - self.last_beat_t < 0.1:
                 skip_beat = True
-                if self.diag2:
+                if self.deep_diag:
                     _LOGGER.info(
-                        f"skip beat threshold triggered: {self.start - self.last_beat_t:0.6f}"
+                        f"skip beat threshold triggered: {self.current_time - self.last_beat_t:0.6f}"
                     )
             else:
                 beat_kick = True
@@ -431,7 +453,7 @@ class Keybeat2d(Twod, GradientEffect):
                 else:
                     self.beat_idx = (self.beat_idx + 1) % self.num_beat_frames
 
-            self.last_beat_t = self.start
+            self.last_beat_t = self.current_time
 
         self.last_beat = self.beat
 
@@ -446,7 +468,7 @@ class Keybeat2d(Twod, GradientEffect):
         else:
             frame_progress = 0.0
 
-        if self.diag2:
+        if self.deep_diag:
             _LOGGER.info(
                 f"self.beat {self.beat:0.6f} beat_inc: {self.beat_incs[self.beat_idx]:0.6f} beat_idx: {self.beat_idx} frame_progress: {frame_progress:0.6f} kick: {beat_kick} seq: {self.frame_s} frame: {self.frame_c}"
             )
@@ -454,5 +476,5 @@ class Keybeat2d(Twod, GradientEffect):
         current_frame = self.frames[self.frame_c]
         self.matrix.paste(current_frame, (self.offset_x, self.offset_y))
 
-        if self.diag2:
+        if self.deep_diag:
             self.overlay(beat_kick, skip_beat)

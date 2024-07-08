@@ -1,5 +1,7 @@
 import asyncio
 import concurrent.futures
+import csv
+import datetime
 import importlib
 import inspect
 import ipaddress
@@ -16,19 +18,30 @@ from abc import ABC
 from collections import deque
 from collections.abc import MutableMapping
 from functools import lru_cache
+from importlib import metadata
 from itertools import chain
+from platform import (
+    processor,
+    python_build,
+    python_implementation,
+    python_version,
+    release,
+    system,
+)
 
 # from asyncio import coroutines, ensure_future
 from subprocess import PIPE, Popen
+from typing import Callable
 
 import numpy as np
 import PIL.Image as Image
 import PIL.ImageFont as ImageFont
 import requests
 import voluptuous as vol
+from dotenv import load_dotenv
 
 from ledfx.config import save_config
-from ledfx.consts import LEDFX_ASSETS_PATH
+from ledfx.consts import LEDFX_ASSETS_PATH, PROJECT_VERSION
 
 # from asyncio import coroutines, ensure_future
 
@@ -70,6 +83,14 @@ else:
 
 
 def calc_available_fps():
+    """
+        Calculates the available frames per second (FPS) based on the sleep resolution of the clock source.
+
+    Note: Used in tests/test_utils.py - if you change this method, please update the test function as well.
+
+        Returns:
+                dict: A dictionary where the keys represent the FPS and the values represent the corresponding multiplier.
+    """
     sleep_res = time.get_clock_info(clock_source).resolution
 
     if sleep_res < 0.001:
@@ -95,6 +116,15 @@ AVAILABLE_FPS = calc_available_fps()
 
 @lru_cache(maxsize=32)
 def fps_to_sleep_interval(fps):
+    """
+    Converts frames per second (fps) to a sleep interval in seconds.
+
+    Args:
+            fps (float): The desired frames per second.
+
+    Returns:
+            float: The sleep interval in seconds.
+    """
     sleep_res = time.get_clock_info(clock_source).resolution
     sleep_ticks = next(
         (t for f, t in AVAILABLE_FPS.items() if f >= fps),
@@ -141,7 +171,20 @@ def import_or_install(package):
 
 
 def async_fire_and_forget(coro, loop, exc_handler=None):
-    """Run some code in the core event loop without a result"""
+    """
+    Run some code in the core event loop without a result
+
+        Args:
+                coro: The coroutine to be executed.
+                loop: The event loop in which the coroutine should be executed.
+                exc_handler: Optional exception handler to be called when the coroutine completes with an exception.
+
+        Raises:
+                TypeError: If the coro parameter is not a coroutine object.
+
+        Returns:
+                None
+    """
 
     if not asyncio.coroutines.iscoroutine(coro):
         raise TypeError(("A coroutine object is required: {}").format(coro))
@@ -179,8 +222,18 @@ def get_local_ip():
 
 
 def async_fire_and_return(coro, callback, timeout=10):
-    """Run some async code in the core event loop with a callback to handle result"""
+    """
+    Run some async code in the core event loop with a callback to handle the result
 
+        Args:
+                coro (coroutine): The coroutine object to be executed.
+                callback (function): The callback function to handle the result of the coroutine.
+                timeout (float, optional): The maximum time to wait for the coroutine to complete. Defaults to 10.
+
+        Raises:
+                TypeError: If the provided coro is not a coroutine object.
+
+    """
     if not asyncio.coroutines.iscoroutine(coro):
         raise TypeError(("A coroutine object is required: {}").format(coro))
 
@@ -200,7 +253,17 @@ def async_fire_and_return(coro, callback, timeout=10):
 
 
 def async_callback(loop, callback, *args):
-    """Run a callback in the event loop with access to the result"""
+    """
+    Run a callback in the event loop with access to the result
+
+        Args:
+                loop (asyncio.AbstractEventLoop): The event loop to run the callback in.
+                callback (Callable): The callback function to be executed.
+                *args: Variable length argument list to be passed to the callback function.
+
+        Returns:
+                concurrent.futures.Future: A future object representing the result of the callback.
+    """
 
     future = concurrent.futures.Future()
 
@@ -298,6 +361,23 @@ class WLED:
         _LOGGER.info(f"WLED {self.ip_address}: Received config")
 
         return wled_config
+
+    async def get_nodes(self):
+        """
+            Uses a JSON API call to pull WLED nodes from the known WLED instance
+        Returns:
+            nodes: dict, with all wled nodes info
+        """
+        _LOGGER.info(f"WLED {self.ip_address}: Attempting to get nodes...")
+        response = await WLED._wled_request(
+            requests.get, self.ip_address, "json/nodes"
+        )
+
+        wled_nodes = response.json()
+
+        _LOGGER.debug(f"WLED {self.ip_address}: Received config {wled_nodes}")
+
+        return wled_nodes
 
     async def get_state(self):
         """
@@ -551,6 +631,37 @@ async def resolve_destination(
             raise ValueError(f"Failed to resolve destination {cleaned_dest}")
 
 
+def read_ledfx_dotenv():
+    """
+    Loads the environment variables from the ledfx.env file.
+
+    In normal development, this does not exist and thus does nothing.
+
+    During the CI build and release process, the ledfx.env file is created and populated with:
+
+    IS_RELEASE = [true|false]
+    GITHUB_SHA = [commit hash]
+
+    It is then packaged in the ledfx folder for distribution.
+
+    If the code is running from a frozen executable, it loads the .env file from the executable's directory.
+    Otherwise, it loads the .env file from the parent directory of the current script.
+
+
+    """
+    extDataDir = os.path.dirname(os.path.realpath(__file__))
+
+    if currently_frozen():
+        extDataDir = sys._MEIPASS
+        path_to_load = os.path.join(extDataDir, "ledfx.env")
+    else:
+        parent_dir = os.path.dirname(extDataDir)
+        path_to_load = os.path.join(parent_dir, "ledfx.env")
+    if os.path.exists(path_to_load):
+        load_dotenv(dotenv_path=path_to_load)
+        _LOGGER.debug(f"Loaded dotenv from {path_to_load}")
+
+
 def currently_frozen():
     """Checks to see if running in a frozen environment such as pyinstaller created binaries
     Args:
@@ -563,7 +674,8 @@ def currently_frozen():
 
 
 def get_icon_path(icon_filename) -> str:
-    """Returns fully qualified path for the tray icon
+    """
+    Returns fully qualified path for the tray icon
     Assumes that the file is within ledfx_assets folder
 
 
@@ -585,18 +697,45 @@ def get_icon_path(icon_filename) -> str:
 
 
 def generate_id(name):
-    """Converts a name to a id"""
+    """
+    Converts a name to an ID.
+
+    Args:
+            name (str): The name to be converted.
+
+    Returns:
+            str: The converted ID.
+    """
     part1 = re.sub("[^a-zA-Z0-9]", " ", name).lower()
     return re.sub(" +", " ", part1).strip().replace(" ", "-")
 
 
 def generate_title(id):
-    """Converts an id to a more human readable title"""
+    """
+    Converts an id to a more human readable title.
+
+    Args:
+            id (str): The id to be converted.
+
+    Returns:
+            str: The human readable title.
+
+    """
     return re.sub("[^a-zA-Z0-9]", " ", id).title()
 
 
 def hasattr_explicit(cls, attr):
-    """Returns if the given object has explicitly declared an attribute"""
+    """
+    Returns True if the given object has explicitly declared an attribute,
+    False otherwise.
+
+    Args:
+            cls: The class or object to check for the attribute.
+            attr: The name of the attribute to check.
+
+    Returns:
+            bool: True if the attribute is explicitly declared, False otherwise.
+    """
     try:
         return getattr(cls, attr) != getattr(super(cls, cls), attr, None)
     except AttributeError:
@@ -604,13 +743,24 @@ def hasattr_explicit(cls, attr):
 
 
 def getattr_explicit(cls, attr, *default):
-    """Gets an explicit attribute from an object"""
+    """
+    Gets an explicit attribute from an object.
 
+    Args:
+            cls: The class or object to retrieve the attribute from.
+            attr: The name of the attribute to retrieve.
+            *default: Optional default value(s) to return if the attribute is not found.
+
+    Returns:
+            The value of the attribute if found, or the default value(s) if provided.
+
+    Raises:
+            AttributeError: If the attribute is not found and no default value is provided.
+            TypeError: If more than 3 arguments are provided as default values.
+    """
     if len(default) > 1:
         raise TypeError(
-            "getattr_explicit expected at most 3 arguments, got {}".format(
-                len(default) + 2
-            )
+            f"getattr_explicit expected at most 3 arguments, got {len(default) + 2}"
         )
 
     if hasattr_explicit(cls, attr):
@@ -628,7 +778,7 @@ class UserDefaultCollection(MutableMapping):
     A collection of default values and user defined values.
     User defined values are saved automatically in LedFx config.
     Items can be retrieved by name as if user and default values are a single dictionary.
-    Validator is a callable that returns sanitised value or raises ValueError if there's a problem
+    Validator is a callable that returns sanitized  value or raises ValueError if there's a problem
     Parser is a callable that translates config values into a valid form for ledfx to use
     """
 
@@ -705,6 +855,12 @@ class UserDefaultCollection(MutableMapping):
 
 
 class RollingQueueHandler(logging.handlers.QueueHandler):
+    """
+    A custom logging handler that extends the QueueHandler class.
+    This handler enqueues log records into a queue, and if the queue is full,
+    it removes the oldest record from the queue before enqueuing the new record.
+    """
+
     def enqueue(self, record):
         try:
             self.queue.put_nowait(record)
@@ -770,8 +926,43 @@ class BaseRegistry(ABC):
                     schema = schema.extend(c_schema.fget().schema)
                 else:
                     schema = schema.extend(c_schema.schema)
+        self.validate_schema_keys(schema)
 
         return schema
+
+    @classmethod
+    def validate_schema_keys(self, schema):
+        """
+        Validates the keys in the given schema.
+
+        Args:
+            schema (vol.Schema): The schema to validate.
+
+        Raises:
+            ValueError: If any key in the schema do not match our naming conventions.
+        """
+        # Check if all keys in the schema use snake_case
+        for key in schema.schema.keys():
+            # If key is a vol.Required or vol.Optional, get the schema from the key
+            # Otherwise, the key is the actual key
+            # This is to handle nested schemas
+            actual_key = (
+                key.schema
+                if isinstance(key, (vol.Required, vol.Optional))
+                else key
+            )
+            if isinstance(actual_key, str):  # Check if actual_key is a string
+                if not is_snake_case(actual_key):
+                    # Raise an error if the key is not snake_case - this is to prevent
+                    # development of new effects/devices that have keys that are not snake_case
+                    error_msg = f"Invalid key '{actual_key}' in {self.__name__}. Keys must use snake_case."
+                    _LOGGER.critical(error_msg)
+                    raise ValueError(error_msg)
+                # We search if the key contains the word "colour" and raise an error if it does, since we want to standardize on color
+                if "colour" in actual_key:
+                    error_msg = f"Invalid key '{actual_key}' in {self.__name__}. Keys must use 'color' instead of 'colour'."
+                    _LOGGER.critical(error_msg)
+                    raise ValueError(error_msg)
 
     @classmethod
     def registry(self):
@@ -1212,13 +1403,15 @@ def extract_positive_integers(s):
     # Use regular expression to find all sequences of digits
     numbers = re.findall(r"\d+", s)
 
-    # Convert each found sequence to an integer and filter out non-positive numbers
-    return [int(num) for num in numbers if int(num) >= 0]
+    # Convert each found sequence to an integer
+    # filter out non-positive numbers
+    # make list unique values via set
+    return list({int(num) for num in numbers if int(num) >= 0})
 
 
-def remove_values_above_limit(numbers, limit):
-    # Keep only values that are less than or equal to the limit
-    return [num for num in numbers if num <= limit]
+def clip_at_limit(numbers, limit):
+    # Keep only values that are less than the limit
+    return [num for num in numbers if num < limit]
 
 
 def open_gif(gif_path):
@@ -1231,20 +1424,49 @@ def open_gif(gif_path):
     Returns:
         Image: PIL Image object or None if failed to open
     """
-    current_directory = os.path.dirname(__file__)
-    absolute_directory = os.path.abspath(current_directory)
-    _LOGGER.debug(
-        f"open_gif cur: {current_directory} abs: {absolute_directory}"
-    )
-
+    _LOGGER.info(f"Attempting to open GIF: {gif_path}")
     try:
         if gif_path.startswith("http://") or gif_path.startswith("https://"):
             with urllib.request.urlopen(gif_path) as url:
-                return Image.open(url)
+                gif = Image.open(url)
+                _LOGGER.debug("Remote GIF downloaded and opened.")
+                return gif
+
         else:
-            return Image.open(gif_path)  # Directly open for local files
+            gif = Image.open(gif_path)  # Directly open for local files
+            _LOGGER.debug("Local GIF opened.")
+            return gif
     except Exception as e:
         _LOGGER.warning(f"Failed to open gif : {gif_path} : {e}")
+        return None
+
+
+def open_image(image_path):
+    """
+    Open an image from a local file or url
+
+    Args:
+        image_path: str
+            path to image file or url
+    Returns:
+        Image: PIL Image object or None if failed to open
+    """
+    _LOGGER.info(f"Attempting to open image: {image_path}")
+    try:
+        if image_path.startswith("http://") or image_path.startswith(
+            "https://"
+        ):
+            with urllib.request.urlopen(image_path) as url:
+                image = Image.open(url)
+                _LOGGER.debug("Remote image downloaded and opened.")
+                return image
+
+        else:
+            image = Image.open(image_path)  # Directly open for local files
+            _LOGGER.debug("Local Image opened.")
+            return image
+    except Exception as e:
+        _LOGGER.warning(f"Failed to open image : {image_path} : {e}")
         return None
 
 
@@ -1293,3 +1515,292 @@ def get_font(font_list, size):
         except OSError:
             continue
     raise RuntimeError("None of the fonts are available on the system.")
+
+
+def generate_default_config(ledfx_effects, effect_id):
+    return ledfx_effects.get_class(effect_id).get_combined_default_schema()
+
+
+def inject_missing_default_keys(presets, defaults):
+    """Inject missing keys from defaults into presets
+    This happens when static or user presets are defined and there are
+    new keys added to the effect config schema later
+    Args:
+        presets (dict): The current presets.
+        defaults (dict): The current defaults.
+    Returns:
+        dict: The updated presets.
+    """
+    for preset in presets.values():
+        default_preset = defaults["reset"]["config"]
+        for key, value in default_preset.items():
+            if key not in preset["config"]:
+                preset["config"][key] = value
+    return presets
+
+
+def generate_defaults(ledfx_presets, ledfx_effects, effect_id):
+    """Generate default presets for an effect.
+    appends effect class defaults to presets
+    This is done at run time, as defaults may not reference all effects
+    So we have to just deal with it when used
+
+    Args:
+        ledfx_presets (dict): The current presets.
+        ledfx_effects (dict): The current effects.
+        effect_id (str): The ID of the effect.
+
+    Returns:
+        dict: The default presets for the effect.
+    """
+    if effect_id in ledfx_presets.keys():
+        presets = ledfx_presets[effect_id]
+    else:
+        presets = {}
+
+    default = {
+        "reset": {
+            "config": generate_default_config(ledfx_effects, effect_id),
+            "name": "reset",
+        }
+    }
+
+    presets = inject_missing_default_keys(presets, default)
+
+    default.update(presets)
+    return default
+
+
+def log_packages():
+    _LOGGER.debug(f"{system()} : {release()} : {processor()}")
+    _LOGGER.debug(
+        f"{python_version()} : {python_build()} : {python_implementation()}"
+    )
+    _LOGGER.debug("Packages")
+    dists = list(metadata.distributions())
+    dists.sort(key=lambda x: x.metadata["name"])
+    for dist in dists:
+        _LOGGER.debug(f"{dist.metadata['name']} : {dist.version}")
+
+
+def is_package_installed(package_name):
+    """
+    Check if a Python package is installed.
+
+    Args:
+        package_name (str): The name of the package to check.
+
+    Returns:
+        bool: True if the package is installed, False otherwise.
+    """
+    try:
+        metadata.distribution(package_name)
+        return True
+    except ModuleNotFoundError:
+        return False
+
+
+def check_optional_dependencies():
+    """
+    Check for optional dependencies and log if they are not installed.
+    """
+    dependencies = ["psutil", "python-mbedtls"]
+    for dependency in dependencies:
+        if is_package_installed(dependency):
+            _LOGGER.info(f"Optional dependency '{dependency}' installed.")
+        else:
+            _LOGGER.info(f"Optional dependency '{dependency}' not installed.")
+
+
+class PerformanceAnalysis:
+    """
+    A class for comparing the performance of two functions.
+    """
+
+    _write_buffer = []
+    _write_buffer_limit = 100
+
+    @staticmethod
+    def compare_functions(
+        original_function: Callable,
+        optimized_function: Callable,
+        num_runs: int = 1,
+    ):
+        """
+        Compare the execution time of two functions.
+
+        To use, import the PerformanceAnalysis using "from ledfx.utils import PerformanceAnalysis"
+        and then call PerformanceAnalysis.compare_functions(lambda: original_function(function arguments), lambda: optimized_function(function_arguments), num_runs).
+
+        For example:
+        PerformanceAnalysis.compare_functions(lambda: fill_rainbow(self.pixels, self._hue, hue_delta),lambda: fill_rainbow_slow(self.pixels, self._hue, hue_delta))
+
+        Parameters:
+        original_function (Callable): The original function to be compared, wrapped in lambda to prevent it from being executed immediately.
+        optimized_function (Callable): The optimized function to be compared, wrapped in lambda to prevent it from being executed immediately.
+        num_runs (int, optional): The number of times each function should be run. Defaults to 1, since we usually use this inside loops.
+
+        Returns:
+        None
+        """
+        original_time = PerformanceAnalysis._timer_wrapper(
+            original_function, num_runs
+        )
+        optimized_time = PerformanceAnalysis._timer_wrapper(
+            optimized_function, num_runs
+        )
+
+        if original_time < optimized_time:
+            faster_method = "Original"
+            percent_faster = (
+                (optimized_time - original_time) / original_time
+            ) * 100
+        else:
+            faster_method = "Optimized"
+            percent_faster = (
+                (original_time - optimized_time) / optimized_time
+            ) * 100
+
+        PerformanceAnalysis._write_to_csv(
+            num_runs,
+            faster_method,
+            original_time,
+            optimized_time,
+            percent_faster,
+        )
+
+    @staticmethod
+    def _timer_wrapper(func: Callable, num_runs: int) -> float:
+        """
+        Time a function over a number of runs.
+
+        Args:
+            func (Callable): The function to be timed.
+            num_runs (int): The number of times to run the function.
+
+        Returns:
+            float: The average time taken to run the function.
+
+        """
+        start_time = time.perf_counter()
+        for _ in range(num_runs):
+            func()
+        end_time = time.perf_counter()
+
+        return (end_time - start_time) / num_runs
+
+    @staticmethod
+    def _write_to_csv(
+        num_runs: int,
+        faster_method: str,
+        original_time: float,
+        optimized_time: float,
+        percent_faster: float,
+    ):
+        """
+        Write the function comparison results to a CSV file - buffer 100 rows before writing to file to minimize disk writes and performance impact.
+
+        Parameters:
+        - num_runs (int): The number of runs performed for the function comparison.
+        - faster_method (str): The name of the faster method being compared.
+        - original_time (float): The execution time of the original method.
+        - optimized_time (float): The execution time of the optimized method.
+        - percent_faster (float): The percentage improvement in execution time of the optimized method compared to the original method.
+        """
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        PerformanceAnalysis._write_buffer.append(
+            [
+                timestamp,
+                num_runs,
+                faster_method,
+                original_time,
+                optimized_time,
+                f"{percent_faster}%",
+            ]
+        )
+
+        if (
+            len(PerformanceAnalysis._write_buffer)
+            >= PerformanceAnalysis._write_buffer_limit
+        ):
+            with open(
+                "performance_analysis.csv", mode="a", newline=""
+            ) as file:
+                writer = csv.writer(file)
+                writer.writerows(PerformanceAnalysis._write_buffer)
+                PerformanceAnalysis._write_buffer.clear()
+
+
+@lru_cache(maxsize=128)
+def is_snake_case(string) -> bool:
+    """
+    Check if a string is in snake_case format.
+
+    Args:
+        string (str): The string to be checked.
+
+    Returns:
+        bool: True if the string is in snake_case format, False otherwise.
+    """
+    return re.match("^[a-z][a-z0-9_]*[a-z0-9]$", string) is not None
+
+
+class UpdateChecker:
+    _update_url = "https://api.github.com/repos/LedFx/LedFx/releases/latest"
+
+    _latest_version = None
+    _release_age = None
+    _release_url = None
+    _update_check_succeeded = None
+
+    @staticmethod
+    def get_release_information():
+        try:
+            response = requests.get(UpdateChecker._update_url, timeout=0.5)
+            response.raise_for_status()
+            data = response.json()
+            UpdateChecker._latest_version = data["tag_name"].replace("v", "")
+            UpdateChecker._release_age = (
+                datetime.datetime.now()
+                - datetime.datetime.strptime(
+                    data["published_at"], "%Y-%m-%dT%H:%M:%SZ"
+                )
+            ).days
+            UpdateChecker._release_url = data["html_url"]
+            UpdateChecker._update_check_succeeded = True
+        except requests.RequestException as e:
+            _LOGGER.info(f"Failed to check for updates: {e}")
+            UpdateChecker._update_check_succeeded = False
+            return False
+
+        return True
+
+    @staticmethod
+    def _get_attribute_if_update_succeeded(attribute):
+        if not UpdateChecker._update_check_succeeded:
+            return None
+        return attribute
+
+    @staticmethod
+    def get_latest_version():
+        return UpdateChecker._get_attribute_if_update_succeeded(
+            UpdateChecker._latest_version
+        )
+
+    @staticmethod
+    def get_release_age():
+        return UpdateChecker._get_attribute_if_update_succeeded(
+            UpdateChecker._release_age
+        )
+
+    @staticmethod
+    def get_release_url():
+        return UpdateChecker._get_attribute_if_update_succeeded(
+            UpdateChecker._release_url
+        )
+
+    @staticmethod
+    def update_available():
+        return UpdateChecker._get_attribute_if_update_succeeded(
+            PROJECT_VERSION != UpdateChecker.get_latest_version()
+        )

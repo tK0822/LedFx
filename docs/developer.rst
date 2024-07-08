@@ -1,10 +1,12 @@
 =======================
    Development Setup
 =======================
+.. _backend-dev:
 
 -------------------------
    Backend Development
 -------------------------
+
 .. warning::
 
     Always be aware of piping commands to any shell - this is the recommended method for poetry but there are `other options <https://python-poetry.org/docs/#installation>`_.
@@ -56,7 +58,7 @@ Windows
 
    .. code:: console
 
-    $ ledfx --open-ui
+    $ poetry run ledfx --open-ui
 
 .. _linux-dev:
 
@@ -66,6 +68,7 @@ Linux
 
     This assumes an apt based system such as ubuntu.
     If your system uses another package manager you should be able use it to get the required packages.
+
 #. Install poetry:
 
    .. code:: console
@@ -86,6 +89,7 @@ Linux
           libavformat58 \
           portaudio19-dev \
           pulseaudio \
+          cmake \
 
 #. Install LedFx and its requirements using poetry:
 
@@ -98,7 +102,7 @@ Linux
 
    .. code:: console
 
-    $ ledfx --open-ui
+    $ poetry run ledfx --open-ui
 
 .. _macos-dev:
 
@@ -127,87 +131,133 @@ macOS
 
    .. code:: console
 
-    $ ledfx --open-ui
+    $ poetry run ledfx --open-ui
 
 ------------------------------
 
-.. --------------------------
-..    Frontend Development
-.. --------------------------
+--------------------------
+   Frontend Development
+--------------------------
 
-.. Building the LedFx frontend is different from how the core backend is built. The frontend is based on React.js and thus
-.. uses NPM as the core package management.
+Building the LedFx frontend is different from how the core backend is built. The frontend is based on React.js and thus
+uses pnpm as the core package management.
 
-.. .. note:: LedFx will need to be running in development mode for everything to work. To enable development mode,
-..           open the ``config.json`` file in the ``.ledfx`` folder and set ``dev_mode: true``)
+.. note:: The following instructions assume you have already followed the steps above to :ref:`install the LedFx dev environment <backend-dev>`
+          and have the backend running. If you have not done so, please do so before continuing.
 
-.. .. _linux-frontend:
+.. note:: LedFx will need to be running in development mode for everything to work. To enable development mode,
+          open the ``config.json`` file in the ``.ledfx`` folder and set ``dev_mode: true``)
+.. _windows-frontend:
 
-.. Linux
-.. -------
+Windows
+-------
 
-.. .. note:: The following instructions assume you have already followed the steps above to :ref:`install the LedFx dev environment <linux-dev>`
 
-.. To get started, first install npm and all the requirements:
+**1.** Install Node.js and pnpm:
 
-.. **1.** Start in the LedFx repo directory:
+First, you need to install Node.js. You can download it from `Node.js official website <https://nodejs.org/en/download/>`_. After installing Node.js, you can install pnpm via npm (which is installed with Node.js).
 
-.. .. code:: console
+.. code:: console
 
-..     $ pip install yarn
-..     $ cd frontend
-..     $ yarn
+    $ npm install -g pnpm
 
-.. The easiest way to test and validate your changes is to run a watcher that will automatically rebuild as you save and then
-.. just leave LedFx running in a separate command window.
+**2.** Navigate to the frontend directory and install the dependencies:
 
-.. **2.** Start LedFx in development mode and start the watcher:
+.. code:: console
 
-.. .. code:: console
+    $ cd frontend
+    $ pnpm install
 
-..     $ python3 ledfx
-..     $ yarn start
+**3.** Start LedFx in developer mode and start the pnpm watcher:
 
-.. At that point any change you make to the frontend will be recompiled and after a browser refresh LedFx will pick up the
-.. new files. After development and testing you will need to run a full build to generate the appropriate distribution files
-.. prior to submitting any changes.
+.. code:: console
 
-.. **3.** When you are finished with your changes, build the frontend:
+    $ poetry shell ledfx
+    $ pnpm start
 
-.. .. code:: console
+At this point, any changes you make to the frontend will be recompiled, and after a browser refresh, LedFx will pick up the new files. After development and testing, you will need to run a full build to generate the appropriate distribution files prior to submitting any changes.
 
-..     $ yarn build
+**4.** When you are finished with your changes, build the frontend:
 
-.. .. _macos-frontend:
+.. code:: console
 
-.. macOS
-.. -------
+    $ pnpm build
 
-.. .. note:: The following instructions assume you have already followed the steps above to :ref:`install the LedFx dev environment <macos-dev>`
+.. _linux-frontend:
 
-.. **1.** Install nodejs and NPM requirements using `homebrew`_:
+Linux
+-------
 
-.. .. code:: console
+**1.** Install Node.js:
 
-..     $ brew install nodejs
-..     $ brew install yarn
-..     $ cd ~/frontend
-..     $ yarn
+Node.js is a prerequisite for pnpm. You can install it using your distribution's package manager. For Ubuntu, you can use the following commands:
 
-.. **2.** Start LedFx in developer mode and start the NPM watcher:
+.. code:: console
 
-.. .. code:: console
+    $ sudo apt-get update
+    $ sudo apt-get install nodejs
 
-..     $ python3 ledfx
-..     $ yarn start
+**2.** Install pnpm:
 
-.. **3.** When you are finished with your changes, build the frontend:
+.. code:: console
 
-.. .. code:: console
+    $ curl -fsSL https://get.pnpm.io/install.sh | sh -
 
-..     $ yarn build
+**3.** Navigate to the frontend directory and install the dependencies:
 
-.. ------------------------------
+.. code:: console
+
+    $ cd frontend
+    $ pnpm install
+
+The easiest way to test and validate your changes is to run a watcher that will automatically rebuild as you save and then
+just leave LedFx running in a separate command window.
+
+**4.** Start LedFx in development mode and start the watcher:
+
+.. code:: console
+
+    $ poetry shell ledfx
+    $ pnpm start
+
+At that point any change you make to the frontend will be recompiled and after a browser refresh LedFx will pick up the
+new files. After development and testing you will need to run a full build to generate the appropriate distribution files
+prior to submitting any changes.
+
+**5.** When you are finished with your changes, build the frontend:
+
+.. code:: console
+
+    $ pnpm build
+
+.. _macos-frontend:
+
+macOS
+-------
+
+**1.** Install nodejs and NPM requirements using `homebrew`_:
+
+.. code:: console
+
+    $ brew install nodejs
+    $ brew install pnpm
+    $ cd ~/frontend
+    $ pnpm install
+
+**2.** Start LedFx in developer mode and start the NPM watcher:
+
+.. code:: console
+
+    $ poetry shell ledfx
+    $ pnpm start
+
+**3.** When you are finished with your changes, build the frontend:
+
+.. code:: console
+
+    $ pnpm build
+
+------------------------------
 
 .. include:: README.rst
 

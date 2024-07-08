@@ -5,6 +5,7 @@ from aiohttp import web
 
 from ledfx.api import RestEndpoint
 from ledfx.config import save_config
+from ledfx.effects import DummyEffect
 from ledfx.events import SceneActivatedEvent
 from ledfx.utils import generate_id
 
@@ -17,14 +18,19 @@ class ScenesEndpoint(RestEndpoint):
     ENDPOINT_PATH = "/api/scenes"
 
     async def get(self) -> web.Response:
-        """Get all scenes"""
+        """
+        Get all scenes.
+
+        Returns:
+            web.Response: The response containing the scenes.
+        """
         response = {
             "status": "success",
             "scenes": self._ledfx.config["scenes"],
         }
-        return web.json_response(data=response, status=200)
+        return await self.bare_request_success(response)
 
-    async def delete(self, request) -> web.Response:
+    async def delete(self, request: web.Request) -> web.Response:
         """Delete a scene"""
         try:
             data = await request.json()
@@ -33,18 +39,14 @@ class ScenesEndpoint(RestEndpoint):
 
         scene_id = data.get("id")
         if scene_id is None:
-            response = {
-                "status": "failed",
-                "reason": 'Required attribute "id" was not provided',
-            }
-            return web.json_response(data=response, status=400)
+            return await self.invalid_request(
+                'Required attribute "id" was not provided'
+            )
 
         if scene_id not in self._ledfx.config["scenes"].keys():
-            response = {
-                "status": "failed",
-                "reason": f"Scene {scene_id} does not exist",
-            }
-            return web.json_response(data=response, status=400)
+            error_message = f"Scene {scene_id} does not exist"
+            _LOGGER.warning(error_message)
+            return await self.invalid_request()
 
         # Delete the scene from configuration
         del self._ledfx.config["scenes"][scene_id]
@@ -54,12 +56,19 @@ class ScenesEndpoint(RestEndpoint):
             config=self._ledfx.config,
             config_dir=self._ledfx.config_dir,
         )
+        return await self.request_success()
 
-        response = {"status": "success"}
-        return web.json_response(data=response, status=200)
+    async def put(self, request: web.Request) -> web.Response:
+        """Activate a scene
 
-    async def put(self, request) -> web.Response:
-        """Activate a scene"""
+        Args:
+            request (web.Request): The request containing the scene `id` and `action`.
+
+        Returns:
+            web.Response: The HTTP response object.
+
+        """
+
         try:
             data = await request.json()
         except JSONDecodeError:
@@ -67,55 +76,38 @@ class ScenesEndpoint(RestEndpoint):
 
         action = data.get("action")
         if action is None:
-            response = {
-                "status": "failed",
-                "reason": 'Required attribute "action" was not provided',
-            }
-            return web.json_response(data=response, status=400)
+            return await self.invalid_request(
+                'Required attribute "action" was not provided'
+            )
 
         if action not in ["activate", "activate_in", "deactivate", "rename"]:
-            response = {
-                "status": "failed",
-                "reason": f'Invalid action "{action}"',
-            }
-            return web.json_response(data=response, status=400)
+            return await self.invalid_request(f'Invalid action "{action}"')
 
         scene_id = data.get("id")
         if scene_id is None:
-            response = {
-                "status": "failed",
-                "reason": 'Required attribute "id" was not provided',
-            }
-            return web.json_response(data=response, status=400)
+            return await self.invalid_request(
+                'Required attribute "id" was not provided'
+            )
 
         if scene_id not in self._ledfx.config["scenes"].keys():
-            response = {
-                "status": "failed",
-                "reason": f'Scene "{scene_id}" does not exist',
-            }
-            return web.json_response(data=response, status=400)
+            return await self.invalid_request(
+                f"Scene {scene_id} does not exist"
+            )
 
         scene = self._ledfx.config["scenes"][scene_id]
 
         if action == "activate_in":
             ms = data.get("ms")
             if ms is None:
-                response = {
-                    "status": "failed",
-                    "reason": 'Required attribute "ms" was not provided',
-                }
-                return web.json_response(data=response, status=400)
+                return await self.invalid_request(
+                    'Required attribute "ms" was not provided'
+                )
             self._ledfx.loop.call_later(
                 ms, self._ledfx.scenes.activate, scene_id
             )
-            response = {
-                "status": "success",
-                "payload": {
-                    "type": "info",
-                    "message": f"Activated scene {scene['name']}",
-                },
-            }
-            return web.json_response(data=response, status=200)
+            return await self.request_success(
+                "info", f"Scene {scene['name']} will activate in {ms}ms"
+            )
 
         if action == "activate":
             for virtual in self._ledfx.virtuals.values():
@@ -142,14 +134,9 @@ class ScenesEndpoint(RestEndpoint):
                     virtual.clear_effect()
 
             self._ledfx.events.fire_event(SceneActivatedEvent(scene_id))
-            response = {
-                "status": "success",
-                "payload": {
-                    "type": "info",
-                    "message": f"Activated scene {scene['name']}",
-                },
-            }
-
+            return await self.request_success(
+                "info", f"Activated {scene['name']}"
+            )
         elif action == "deactivate":
             for virtual in self._ledfx.virtuals.values():
                 # Check virtual is in scene, make no changes if it isn't
@@ -164,23 +151,16 @@ class ScenesEndpoint(RestEndpoint):
                 # Clear the effect of virtual,
                 if scene["virtuals"][virtual.id]:
                     virtual.clear_effect()
-
-            response = {
-                "status": "success",
-                "payload": {
-                    "type": "info",
-                    "message": f"Deactivated scene {scene['name']}",
-                },
-            }
+            return await self.request_success(
+                "info", f"Deactivated {scene['name']}"
+            )
 
         elif action == "rename":
             name = data.get("name")
             if name is None:
-                response = {
-                    "status": "failed",
-                    "reason": 'Required attribute "name" was not provided',
-                }
-                return web.json_response(data=response, status=400)
+                return await self.invalid_request(
+                    'Required attribute "name" was not provided'
+                )
 
             # Update and save config
             self._ledfx.config["scenes"][scene_id]["name"] = name
@@ -188,18 +168,21 @@ class ScenesEndpoint(RestEndpoint):
                 config=self._ledfx.config,
                 config_dir=self._ledfx.config_dir,
             )
+            return await self.request_success(
+                "info", f"Renamed {scene['name']} to {name}"
+            )
 
-            response = {
-                "status": "success",
-                "payload": {
-                    "type": "info",
-                    "message": f"Renamed scene to {name}",
-                },
-            }
-        return web.json_response(data=response, status=200)
+    async def post(self, request: web.Request) -> web.Response:
+        """
+        Save current effects of virtuals as a scene.
 
-    async def post(self, request) -> web.Response:
-        """Save current effects of virtuals as a scene"""
+        Args:
+            request (web.Request): The request object containing `name`, `scene_tags`, `scene_puturl`, `scene_payload`, `scene_midiactivate` (optional), `scene_image` (optinal), and `virtuals` (optional).
+
+        Returns:
+            web.Response: The HTTP response object.
+        """
+
         try:
             data = await request.json()
         except JSONDecodeError:
@@ -213,12 +196,11 @@ class ScenesEndpoint(RestEndpoint):
         scene_image = data.get("scene_image")
         if scene_image is None:
             scene_image = "Wallpaper"
-        if scene_name is None:
-            response = {
-                "status": "failed",
-                "reason": 'Required attribute "scene_name" was not provided',
-            }
-            return web.json_response(data=response, status=400)
+        if scene_name is None or scene_name == "":
+            error_message = "Required attribute 'scene_name' was not provided"
+            _LOGGER.warning(error_message)
+
+            return await self.invalid_request(error_message)
 
         scene_id = generate_id(scene_name)
 
@@ -235,9 +217,16 @@ class ScenesEndpoint(RestEndpoint):
             for virtual in self._ledfx.virtuals.values():
                 effect = {}
                 if virtual.active_effect:
-                    effect["type"] = virtual.active_effect.type
-                    effect["config"] = virtual.active_effect.config
-                    # effect['name'] = virtual.active_effect.name
+                    # prevent crash from trying to save copy / span transitions
+                    # which appear active even when the virtual is not!!!
+                    if not isinstance(virtual.active_effect, DummyEffect):
+                        effect["type"] = virtual.active_effect.type
+                        effect["config"] = virtual.active_effect.config
+                        # effect['name'] = virtual.active_effect.name
+                    else:
+                        _LOGGER.debug(
+                            f"Skipping DummyEffect for virtual {virtual.id}"
+                        )
                 scene_config["virtuals"][virtual.id] = effect
         else:
             virtuals = data.get("virtuals")
@@ -262,4 +251,4 @@ class ScenesEndpoint(RestEndpoint):
             "status": "success",
             "scene": {"id": scene_id, "config": scene_config},
         }
-        return web.json_response(data=response, status=200)
+        return await self.bare_request_success(response)

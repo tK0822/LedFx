@@ -5,6 +5,7 @@ import numpy as np
 import PIL.Image as Image
 import voluptuous as vol
 
+from ledfx.effects.audio import AudioReactiveEffect
 from ledfx.effects.gradient import GradientEffect
 from ledfx.effects.twod import Twod
 
@@ -17,23 +18,15 @@ class Plasma2d(Twod, GradientEffect):
     HIDDEN_KEYS = Twod.HIDDEN_KEYS + ["background_color", "gradient_roll"]
     ADVANCED_KEYS = Twod.ADVANCED_KEYS + []
 
-    _power_funcs = {
-        "Beat": "beat_power",
-        "Bass": "bass_power",
-        "Lows (beat+bass)": "lows_power",
-        "Mids": "mids_power",
-        "High": "high_power",
-    }
-
     CONFIG_SCHEMA = vol.Schema(
         {
             vol.Optional(
                 "frequency_range",
                 description="Frequency range for the beat detection",
                 default="Lows (beat+bass)",
-            ): vol.In(list(_power_funcs.keys())),
+            ): vol.In(list(AudioReactiveEffect.POWER_FUNCS_MAPPING.keys())),
             vol.Optional(
-                "v density",
+                "density_vertical",
                 description="Lets pretend its vertical density",
                 default=0.1,
             ): vol.All(vol.Coerce(float), vol.Range(min=0.01, max=0.3)),
@@ -67,10 +60,12 @@ class Plasma2d(Twod, GradientEffect):
         self.time = timeit.default_timer()
         self.density = self._config["density"]
         self.lower = self._config["lower"]
-        self.power_func = self._power_funcs[self._config["frequency_range"]]
-        self.v_density = self._config["v density"]
+        self.power_func = self.POWER_FUNCS_MAPPING[
+            self._config["frequency_range"]
+        ]
+        self.density_vertical = self._config["density_vertical"]
         self.twist = self._config["twist"]
-        self.radius = self.config["radius"]
+        self.radius = self._config["radius"]
         super().config_updated(config)
 
     def do_once(self):
@@ -93,7 +88,7 @@ class Plasma2d(Twod, GradientEffect):
         # Calculate the plasma values
         plasma = (
             np.sin(x * 0.1 + time) * np.cos(y * 0.1 - time)
-            + np.sin((x * self.v_density + y * self.twist + time) * 2.5)
+            + np.sin((x * self.density_vertical + y * self.twist + time) * 2.5)
             + np.sin(np.sqrt(x**2 + y**2) * self.radius - time)
         ) * 128 + 128
 
@@ -107,13 +102,11 @@ class Plasma2d(Twod, GradientEffect):
         if self.test:
             self.draw_test(self.m_draw)
 
-        current_time = timeit.default_timer() - self.start_time
-
         plasma_array = self.generate_plasma(
-            self.r_width, self.r_height, current_time, self.bar
+            self.r_width, self.r_height, self.current_time, self.bar
         )
 
-        color_mapped_plasma = self.get_gradient_color_vectorized(
+        color_mapped_plasma = self.get_gradient_color_vectorized2d(
             plasma_array
         ).astype(np.uint8)
 

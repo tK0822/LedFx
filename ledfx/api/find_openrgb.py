@@ -1,4 +1,5 @@
 import logging
+from json import JSONDecodeError
 
 from aiohttp import web
 from openrgb import OpenRGBClient
@@ -9,36 +10,31 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class FindOpenRGBDevicesEndpoint(RestEndpoint):
-    """REST end-point for detecting and reporting OpenRGB devices
-    optional params for server and port"""
+    """
+    REST end-point for detecting and reporting OpenRGB devices.
+    """
 
     ENDPOINT_PATH = "/api/find_openrgb"
 
-    async def get(self, request) -> web.Response:
-        """Check for an openrgb server and report devices"""
+    async def get(self) -> web.Response:
+        """
+        Check for an OpenRGB server at localhost on the default port and report devices if found.
 
-        if "server" in request.query.keys():
-            server = request.query["server"]
-        else:
-            server = "127.0.0.1"
-
-        if "port" in request.query.keys():
-            port = int(request.query["port"])
-        else:
-            port = 6742
+        Returns:
+            web.Response: The HTTP response object containing either an error, or a dict of OpenRGB devices at localhost:6742.
+        """
 
         try:
-            client = OpenRGBClient(address=server, port=port)
+            client = OpenRGBClient(address="127.0.0.1", port=6742)
         except Exception as e:
-            _LOGGER.error(f"Failed to connect to OpenRGB server: {e}")
-            response = {
-                "status": "success",
-                "payload": {
-                    "type": "info",
-                    "message": f"No OpenRGB server on port {port} found",
-                },
-            }
-            return web.json_response(data=response, status=200)
+            error_message = (
+                f"Unable to connect to OpenRGB server at localhost:6742, {e}."
+            )
+            _LOGGER.warning(error_message)
+            return await self.request_success(
+                "warning",
+                error_message,
+            )
 
         devices = []
         for device in client.devices:
@@ -50,6 +46,57 @@ class FindOpenRGBDevicesEndpoint(RestEndpoint):
                     "leds": len(device.leds),
                 }
             )
-
         response = {"status": "success", "devices": devices}
-        return web.json_response(data=response, status=200)
+        return await self.bare_request_success(response)
+
+    async def post(self, request: web.Request) -> web.Response:
+        """
+        Check for an OpenRGB server at and report devices if found.
+
+        Args:
+            request (web.Request): The incoming request object that contains the `server` (str) and `port` (str or int). Defaults to 127.0.0.1 and 6742 if not provided.
+
+        Returns:
+            web.Response: The HTTP response object containing either an error, or a dict of OpenRGB devices on the given server.
+        """
+        try:
+            data = await request.json()
+        except JSONDecodeError:
+            _LOGGER.warning(
+                "Unable to decode JSON from OpenRGB request, using default localhost:6742."
+            )
+            data = {}
+
+        server = data.get("server", "127.0.0.1")
+        port = data.get("port", "6742")
+
+        try:
+            port = int(port)
+        except ValueError:
+            error_message = f"Unable to convert {port} to int."
+            _LOGGER.warning(error_message)
+            return await self.invalid_request(error_message)
+
+        try:
+            client = OpenRGBClient(address=server, port=port)
+        except Exception as e:
+            error_message = (
+                f"Unable to connect to OpenRGB server at {server}:{port}, {e}."
+            )
+            _LOGGER.warning(error_message)
+            return await self.request_success(
+                "warning",
+                error_message,
+            )
+        devices = []
+        for device in client.devices:
+            devices.append(
+                {
+                    "name": device.name,
+                    "type": device.type,
+                    "id": device.id,
+                    "leds": len(device.leds),
+                }
+            )
+        response = {"status": "success", "devices": devices}
+        return await self.bare_request_success(response)
