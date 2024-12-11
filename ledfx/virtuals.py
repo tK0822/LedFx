@@ -5,11 +5,13 @@ import threading
 import time
 import timeit
 from functools import cached_property
+from typing import Optional
 
 import numpy as np
 import voluptuous as vol
 
 from ledfx.color import parse_color
+from ledfx.config import save_config
 from ledfx.effects import DummyEffect
 from ledfx.effects.math import interpolate_pixels, make_pattern
 from ledfx.effects.melbank import (
@@ -27,8 +29,6 @@ from ledfx.events import (
     VirtualPauseEvent,
     VirtualUpdateEvent,
 )
-
-# from ledfx.config import save_config
 from ledfx.transitions import Transitions
 from ledfx.utils import fps_to_sleep_interval
 
@@ -159,6 +159,12 @@ class Virtual:
         self._os_active = False
         self.lock = threading.Lock()
         self.clear_handle = None
+        self.fallback_effect_type = None
+        self.fallback_fire = False
+        self.fallback_config = None
+        self.fallback_timer = None
+        self.fallback_suppress_transition = False
+        self._streaming = False
 
         self.frequency_range = FrequencyRange(
             self._config["frequency_min"], self._config["frequency_max"]
@@ -313,6 +319,7 @@ class Virtual:
             _LOGGER.debug(
                 f"Virtual {self.id}: updated with {len(self._segments)} segments, totalling {self.pixel_count} pixels"
             )
+            self._ledfx.virtuals.check_and_deactivate_devices()
 
     def set_preset(self, preset_info):
         """
@@ -339,12 +346,93 @@ class Virtual:
         )
         self.set_effect(effect)
 
-    def set_effect(self, effect):
+    def set_fallback(self):
+        """
+        Sets the active effect to the stored fallback effect if available.
+        """
+        if self.fallback_effect_type is not None:
+
+            effect = self._ledfx.effects.create(
+                ledfx=self._ledfx,
+                type=self.fallback_effect_type,
+                config=self.fallback_config,
+            )
+            self.set_effect(effect, fallback=None)
+            update_effect_config(self._ledfx.config, self.id, effect)
+            save_config(
+                config=self._ledfx.config,
+                config_dir=self._ledfx.config_dir,
+            )
+            # make sure fallback is disabled
+            self.fallback_effect_type = None
+            self.fallback_suppress_transition = False
+            _LOGGER.info(f"{self.name} set_fallback: suppress = False")
+        else:
+            # there was no active effect when the fallback effect started
+            self.clear_effect()
+            # make sure fallback is disabled
+            self.fallback_effect_type = None
+            self.fallback_suppress_transition = False
+
+            # and make sure we save the config with the effect removed
+            for virtual_cfg in self._ledfx.config["virtuals"]:
+                if virtual_cfg["id"] == self.id:
+                    virtual_cfg.pop("effect", None)
+                    break
+
+            save_config(
+                config=self._ledfx.config,
+                config_dir=self._ledfx.config_dir,
+            )
+
+    def fallback_clear(self):
+        """clear down all fallback behaviours, normally called after a fallback has completed"""
+        self.fallback_effect_type = None
+        if self.fallback_timer is not None:
+            self.fallback_timer.cancel()
+            self.fallback_timer = None
+        self.fallback_suppress_transition = False
+        _LOGGER.info(f"{self.name} fallback_clear: suppress = False")
+
+    def fallback_start(self, fallback: float):
+        """Suppress transitions, clear and start the fallback timer
+        This funciton should only be called from within the virtual lock
+
+        Args:
+            fallback (float): Time in seconds to wait before firing the fallback
+        """
+        self.fallback_suppress_transition = True
+        _LOGGER.info(f"{self.name} fallback_start: suppress = True")
+
+        if self.fallback_timer is not None:
+            self.fallback_timer.cancel()
+        _LOGGER.info(f"Setting fallback timer for {fallback} seconds")
+        self.fallback_timer = threading.Timer(fallback, self.fallback_fire_set)
+        self.fallback_timer.start()
+
+    def fallback_fire_set_with_lock(self):
+        """Use this function to trigger a fallback from an external source such as api calls"""
+        with self.lock:
+            self.fallback_fire_set()
+
+    def fallback_fire_set(self):
+        """clear fallback timers and trigger the fallback to enact"""
+        if self.fallback_timer is not None:
+            self.fallback_timer.cancel()
+            self.fallback_timer = None
+        if self.fallback_effect_type is not None:
+            _LOGGER.info(f"{self.name} fallback_fire_set")
+            self.fallback_fire = True
+
+    def set_effect(self, effect, fallback: Optional[float] = None):
         """
         Sets the active effect for the virtual device.
 
         Args:
             effect: The effect to set as the active effect.
+            fallback: If not None, the current active effect is set as the fallback effect
+                      and a fallback timer triggered for fallback seconds
+                      If None, the new effect is set and any existing fallback timer is cleared
 
         Raises:
             ValueError: If no configured device segments are available.
@@ -357,9 +445,31 @@ class Virtual:
                 _LOGGER.warning(error)
                 raise ValueError(error)
 
+            if fallback is not None:
+                _LOGGER.info("Fallback requested")
+                if self._active_effect is not None:
+                    if self.fallback_effect_type is None:
+                        self.fallback_effect_type = self._active_effect.type
+                        self.fallback_config = self._active_effect.config
+                        self.fallback_start(fallback)
+                        _LOGGER.info(
+                            f"Setting fallback to {self.fallback_effect_type}"
+                        )
+                    else:
+                        # don't let new fallbacks override old ones, we don't want text falling back to text
+                        _LOGGER.info(
+                            f"There is already a fallback registered {self.fallback_effect_type}"
+                        )
+                        self.fallback_start(fallback)
+                else:
+                    _LOGGER.info("No current _active_effect to fallback to")
+                    self.fallback_effect_type = None
+                    self.fallback_start(fallback)
+
             if (
                 self._config["transition_mode"] != "None"
                 and self._config["transition_time"] > 0
+                and not self.fallback_suppress_transition
             ):
                 self.transition_frame_total = (
                     self.refresh_rate * self._config["transition_time"]
@@ -377,6 +487,11 @@ class Virtual:
                 # no transition effect to clean up, so clear the active effect now!
                 self.clear_active_effect()
                 self.clear_transition_effect()
+
+            if fallback is None:
+                # any effect being set without fallback will clear the fallback
+                # remove suppression of transitions
+                self.fallback_clear()
 
             self.flush_pending_clear_frame()
 
@@ -412,6 +527,7 @@ class Virtual:
             if (
                 self._config["transition_mode"] != "None"
                 and self._config["transition_time"] > 0
+                and not self.fallback_suppress_transition
             ):
                 self._transition_effect = self._active_effect
                 self._active_effect = DummyEffect(self.effective_pixel_count)
@@ -426,8 +542,13 @@ class Virtual:
 
             self.flush_pending_clear_frame()
 
+            delay = (
+                0
+                if self.fallback_suppress_transition
+                else self._config["transition_time"]
+            )
             self.clear_handle = self._ledfx.loop.call_later(
-                self._config["transition_time"], self.clear_frame
+                delay, self.clear_frame
             )
 
     def flush_pending_clear_frame(self):
@@ -505,9 +626,9 @@ class Virtual:
         Following calls will override any active one shot
 
         Parameters:
-            ramp time from 0% to 100% in ms
-            hold time at 100% in ms
-            fade time from 100% to 0% in ms
+            ramp time from in ms
+            hold time in ms
+            fade time in ms
         Returns:
             True if oneshot was activated, False if not
         """
@@ -520,7 +641,13 @@ class Virtual:
             self._os_hold_end = self._os_ramp + self._os_hold
             self._os_fade_end = self._os_ramp + self._os_hold + self._os_fade
             self._os_weight = 0.0
-            self._os_active = True
+
+            # if all total timings are zero, treat as a hard off
+            if self._os_fade_end == 0:
+                self._os_active = False
+            else:
+                self._os_active = True
+
             result = True
         else:
             result = False
@@ -581,6 +708,11 @@ class Virtual:
             if not self._active:
                 break
             start_time = timeit.default_timer()
+
+            if self.fallback_fire:
+                self.set_fallback()
+                self.fallback_fire = False
+
             # we need to lock before we test, or we could deactivate
             # between test and execution
             with self.lock:
@@ -670,9 +802,12 @@ class Virtual:
                         / self.transition_frame_total
                     )
 
-                self.frame_transitions(
-                    self.transitions, frame, transition_frame, weight
-                )
+                # we will pre validate the transition, which will generate a sentry report if it fails and return False
+                if self.transitions.pre_validate(frame, transition_frame):
+                    # only call the transition effect if it will not crash
+                    self.frame_transitions(
+                        self.transitions, frame, transition_frame, weight
+                    )
                 if (
                     self.transition_frame_counter
                     == self.transition_frame_total
@@ -700,11 +835,11 @@ class Virtual:
             f"Virtual {self.id}: Activating with segments {self._segments}"
         )
         if not self._active:
+            self._active = True
             try:
                 self.activate_segments(self._segments)
             except ValueError as e:
                 _LOGGER.error(e)
-            self._active = True
             self._os_active = False
 
         # self.thread_function()
@@ -716,6 +851,7 @@ class Virtual:
         self._ledfx.events.fire_event(VirtualPauseEvent(self.id))
         # self._task = self._ledfx.loop.create_task(self.thread_function())
         # self._task.add_done_callback(lambda task: task.result())
+        self._ledfx.virtuals.check_and_deactivate_devices()
 
     def deactivate(self):
         self._active = False
@@ -724,6 +860,7 @@ class Virtual:
             self._thread.join()
         self.deactivate_segments()
         self._ledfx.events.fire_event(VirtualPauseEvent(self.id))
+        self._ledfx.virtuals.check_and_deactivate_devices()
 
     # @lru_cache(maxsize=32)
     # def _normalized_linspace(self, size):
@@ -854,6 +991,10 @@ class Virtual:
     @property
     def active(self):
         return self._active
+
+    @property
+    def streaming(self):
+        return self._streaming
 
     @active.setter
     def active(self, active):
@@ -1022,7 +1163,7 @@ class Virtual:
                     ):
                         self._active_effect.clear_melbank_freq_props()
 
-                    if _config["rows"] != self._config["rows"]:
+                    if _config["rows"] != self.rows:
                         if hasattr(self._active_effect, "set_init"):
                             self._active_effect.set_init()
 
@@ -1083,6 +1224,27 @@ class Virtual:
 
         return effective_pixels
 
+    @property
+    def rows(self) -> int:
+        """
+        Property that returns the number of rows from the configuration.
+        Returns:
+            int: The number of rows specified in the configuration.
+        """
+        return self._config["rows"]
+
+    @rows.setter
+    def rows(self, rows: int) -> None:
+        """
+        Sets the number of rows in the configuration.
+
+        If the number of rows passed is less than 1, it will be set to 1.
+
+        Args:
+            rows (int): The number of rows to set in the configuration.
+        """
+        self._config["rows"] = max(1, rows)
+
 
 class Virtuals:
     """Thin wrapper around the device registry that manages virtuals"""
@@ -1094,13 +1256,14 @@ class Virtuals:
         # super().__init__(ledfx, Virtual, self.PACKAGE_NAME)
 
         def cleanup_effects(e):
+            self.fire_all_fallbacks()
             self.clear_all_effects()
 
         self._ledfx = ledfx
         self._ledfx.events.add_listener(cleanup_effects, Event.LEDFX_SHUTDOWN)
         self._virtuals = {}
 
-    def create_from_config(self, config):
+    def create_from_config(self, config, pause_all=False):
         for virtual in config:
             _LOGGER.debug(f"Loading virtual from config: {virtual}")
             self._ledfx.virtuals.create(
@@ -1142,6 +1305,10 @@ class Virtuals:
             # via the active key if it exists. Let the setter deal with it
             if "active" in virtual and not virtual["active"]:
                 self._ledfx.virtuals.get(virtual["id"]).active = False
+
+            # global pause is handled differently to virtual pause
+            if pause_all:
+                self._ledfx.virtuals.get(virtual["id"])._paused = True
 
             self._ledfx.events.fire_event(
                 VirtualConfigUpdateEvent(virtual["id"], virtual["config"])
@@ -1196,6 +1363,10 @@ class Virtuals:
         for virtual in self.values():
             virtual.clear_frame()
 
+    def fire_all_fallbacks(self):
+        for virtual in self.values():
+            virtual.set_fallback()
+
     def pause_all(self):
         self._paused = not self._paused
         for virtual in self.values():
@@ -1204,6 +1375,58 @@ class Virtuals:
 
     def get(self, *args):
         return self._virtuals.get(*args)
+
+    def check_and_deactivate_devices(self):
+        """
+        Checks all active virtuals and segments to compile a list of active devices,
+        then deactivates any active devices not in that list.
+
+        This process ensures that devices are only deactivated if no virtual or segment
+        is using them, which is especially relevant during virtual or segment deactivation
+        or reconfiguration.
+
+        It also walks through all virtuals, if they are in the active devices list, but not active, they will be marked as streaming
+
+        Note: This is a relatively expensive operation but only runs when a virtual
+        is deactivated or segments are modified.
+        """
+
+        active_devices = set()
+        for virtual in self.values():
+            if virtual.active:
+                for device_id, _, _, _ in virtual.segments:
+                    active_devices.add(device_id)
+
+        for device in self._ledfx.devices.values():
+            if device.id not in active_devices and device.is_active():
+                _LOGGER.info(
+                    f"Deactivating device {device.id} as it is not in use by any active virtuals"
+                )
+                device.deactivate()
+
+        # go through each device in the registry and work out its streaming state
+        # if it has segments, but its paired virtual is not active, then it should it must be streaming
+        _LOGGER.info(
+            "-------------------------------------------------------------------------------"
+        )
+        _LOGGER.info(
+            "Virtual                       is_device                    Active    Streaming "
+        )
+        _LOGGER.info(
+            "-------------------------------------------------------------------------------"
+        )
+
+        for virtual_id in self._ledfx.virtuals:
+            virtual = self._ledfx.virtuals.get(virtual_id)
+
+            virtual._streaming = (
+                virtual_id in active_devices and not virtual.active
+            )
+
+            _LOGGER.info(
+                f"{virtual_id:<29} {str(virtual.is_device):<29}{str(virtual.active):<10}{str(virtual.streaming):<10}"
+            )
+        _LOGGER.info(f"Active Devices: {active_devices}")
 
 
 def update_effect_config(config, virtual_id, effect):

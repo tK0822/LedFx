@@ -30,7 +30,6 @@ from ledfx.config import (
 from ledfx.consts import PROJECT_VERSION
 from ledfx.devices import Devices
 from ledfx.effects import Effects
-from ledfx.effects.math import interpolate_pixels
 from ledfx.events import (
     Event,
     Events,
@@ -48,6 +47,9 @@ from ledfx.utils import (
     UserDefaultCollection,
     async_fire_and_forget,
     currently_frozen,
+    pixels_boost,
+    resize_pixels,
+    shape_to_fit_len,
 )
 from ledfx.virtuals import Virtuals
 
@@ -232,10 +234,28 @@ class LedFxCore:
 
             time_since_last[vis_id] = time_now
 
-            pixels = event.pixels
+            # grab rows from up in virtual land
+            virtual = self.virtuals.get(vis_id)
+            # protect against deleted virtuals
+            if virtual:
+                rows = virtual.rows
+            else:
+                rows = 1
 
-            if len(pixels) > max_len:
-                pixels = interpolate_pixels(pixels, max_len)
+            pixels = event.pixels
+            pixels_len = len(pixels)
+            shape = (rows, int(pixels_len / rows))
+            if pixels_len > max_len:
+                new_shape, pixels_len = shape_to_fit_len(
+                    max_len, shape, pixels_len
+                )
+                pixels = resize_pixels(pixels[:pixels_len], shape, new_shape)
+                shape = new_shape
+
+            if self.config["ui_brightness_boost"] != 0:
+                pixels = pixels_boost(
+                    pixels, self.config["ui_brightness_boost"], 100
+                )
 
             if (
                 self.config["transmission_mode"]
@@ -247,7 +267,7 @@ class LedFxCore:
                 pixels = pixels.astype(np.uint8).T.tolist()
 
             self.events.fire_event(
-                VisualisationUpdateEvent(is_device, vis_id, pixels)
+                VisualisationUpdateEvent(is_device, vis_id, pixels, shape)
             )
 
         _LOGGER.debug("Setting up visualisation event handler.")
@@ -323,8 +343,10 @@ class LedFxCore:
                         "Unable to get update information", "LedFx"
                     )
 
-    def start(self, open_ui=False):
-        async_fire_and_forget(self.async_start(open_ui=open_ui), self.loop)
+    def start(self, open_ui=False, pause_all=False):
+        async_fire_and_forget(
+            self.async_start(open_ui=open_ui, pause_all=pause_all), self.loop
+        )
 
         try:
             self.loop.run_forever()
@@ -344,7 +366,7 @@ class LedFxCore:
 
         return self.exit_code
 
-    async def async_start(self, open_ui=False):
+    async def async_start(self, open_ui=False, pause_all=False):
         _LOGGER.info(f"Starting LedFx, listening on {self.host}:{self.port}")
 
         await self.http.start(get_ssl_certs(config_dir=self.config_dir))
@@ -383,7 +405,9 @@ class LedFxCore:
         await self.devices.async_initialize_devices()
 
         self.zeroconf = ZeroConfRunner(ledfx=self)
-        self.virtuals.create_from_config(self.config["virtuals"])
+        self.virtuals.create_from_config(
+            self.config["virtuals"], pause_all=pause_all
+        )
         self.integrations.create_from_config(self.config["integrations"])
 
         if self.config["scan_on_startup"]:
@@ -404,6 +428,10 @@ class LedFxCore:
 
         if not self.offline_mode:
             self.check_and_notify_updates()
+
+        if pause_all:
+            # pause at the virtuals level
+            self.virtuals.pause_all()
 
     def stop(self, exit_code):
         async_fire_and_forget(self.async_stop(exit_code), self.loop)

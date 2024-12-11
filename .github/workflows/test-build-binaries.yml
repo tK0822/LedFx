@@ -178,7 +178,7 @@ jobs:
           path: ${{ github.workspace }}/dist/*
   build-ledfx-osx-m1:
     name: Build LedFx (OS X) (Apple Silicon)
-    runs-on: flyci-macos-large-latest-m1
+    runs-on: macos-latest
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v4
@@ -230,6 +230,7 @@ jobs:
           export PATH="/opt/homebrew/opt/mbedtls@2/bin:$PATH"
           export LDFLAGS="-L/opt/homebrew/opt/mbedtls@2/lib"
           export CPPFLAGS="-I/opt/homebrew/opt/mbedtls@2/include"
+          export CFLAGS="-Wno-incompatible-function-pointer-types"
           poetry install --with dev --extras hue
       - name: Get LedFx Version
         id: ledfx-version
@@ -304,8 +305,8 @@ jobs:
           chmod +x ./LedFx.app/Contents/MacOS/LedFx
           ./LedFx.app/Contents/MacOS/LedFx -vv --ci-smoke-test --offline
   run-ledfx-osx-m1:
-    name: Test LedFx (OS X) (Apple Silicon)
-    runs-on: flyci-macos-large-latest-m1
+    name: Test LedFx (OS X [ARM64])
+    runs-on: macos-latest
     needs: [build-ledfx-windows, build-ledfx-osx-m1]
     steps:
       - name: Download LedFx Version
